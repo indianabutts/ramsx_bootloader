@@ -89,6 +89,7 @@ GamesLoop:
 	ld hl, selectorIndex
 	ld c, (hl)
 	cp c
+	call z, PrintPointer
 	pop hl
 	
 	
@@ -125,8 +126,10 @@ PrintStr:
 	jr PrintStr
 
 PrintPointer:
+	push af
 	ld a, (pointerChar)
 	call CHPUT
+	pop af
 	ret
 
 NewLn:
@@ -150,7 +153,7 @@ MainLoop:
 goBack:	 db " ..",0
 dirName: db " Games/",0
 pointerChar:
-	db ">",0
+	db ">"
 
 
 selectorIndex:

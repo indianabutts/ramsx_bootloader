@@ -1,5 +1,5 @@
 Sections:
-00: "seg4000" (4000-4261)
+00: "seg4000" (4000-4265)
 
 
 Source: "./main.asm"
@@ -134,12 +134,12 @@ Source: "./main.asm"
 00:41E9 32EBF3          	    61: 	ld (BDCLR), a
 00:41EC CD6200          	    62: 	call CHCOLOR
                         	    63: 	; Dummy Dir Name and Go Back to determine maximum games in list
-00:41EF 215242          	    64: 	ld hl, dirName
-00:41F2 CD2C42          	    65: 	call PrintStr
-00:41F5 CD3D42          	    66: 	call NewLn
-00:41F8 214E42          	    67: 	ld hl, goBack
-00:41FB CD2C42          	    68: 	call PrintStr
-00:41FE CD3D42          	    69: 	call NewLn
+00:41EF 215742          	    64: 	ld hl, dirName
+00:41F2 CD2F42          	    65: 	call PrintStr
+00:41F5 CD4242          	    66: 	call NewLn
+00:41F8 215342          	    67: 	ld hl, goBack
+00:41FB CD2F42          	    68: 	call PrintStr
+00:41FE CD4242          	    69: 	call NewLn
                         	    70: 	; Load start address for Games List
 00:4201 211040          	    71: 	ld hl,games
                         	    72: 	; ld (currentGame), hl
@@ -147,7 +147,7 @@ Source: "./main.asm"
 00:4204 11DE41          	    74: 	ld de, gamesend
                         	    75: 	; Initialize Loop Index to 0
 00:4207 3E00            	    76: 	ld a, 0 
-00:4209 325F42          	    77: 	ld (loopIndex), a
+00:4209 326342          	    77: 	ld (loopIndex), a
                         	    78: 
                         	    79: GamesLoop:
                         	    80: 	; Put Pointer Character if LoopIndex is Equ to PointerIndex
@@ -156,114 +156,116 @@ Source: "./main.asm"
 00:420C E5              	    83: 	push hl
                         	    84: 
                         	    85: 	;; Get the LoopIndex	
-00:420D 215F42          	    86: 	ld hl, loopIndex
+00:420D 216342          	    86: 	ld hl, loopIndex
 00:4210 7E              	    87: 	ld a, (hl)
                         	    88: 	;; Get the Pointer Index
-00:4211 215C42          	    89: 	ld hl, selectorIndex
+00:4211 216042          	    89: 	ld hl, selectorIndex
 00:4214 4E              	    90: 	ld c, (hl)
 00:4215 B9              	    91: 	cp c
-00:4216 E1              	    92: 	pop hl
-                        	    93: 	
+00:4216 CC3942          	    92: 	call z, PrintPointer
+00:4219 E1              	    93: 	pop hl
                         	    94: 	
-                        	    95: 	;; Compare the two, if equal, then print the pointer, else continue
-                        	    96: 
-                        	    97: 	;; Restore HL
-                        	    98: 
-                        	    99: 	
-                        	   100: 	; Print Current Game Name and a new line
-00:4217 CD2C42          	   101: 	call PrintStr
-00:421A CD3D42          	   102: 	call NewLn
-                        	   103: 	
-                        	   104: 	; Compare HL to GamesEnd
-00:421D 3E00            	   105: 	ld a, 0
-00:421F B7              	   106: 	or a	; Clears Carry Flag
-00:4220 23              	   107: 	inc hl
-00:4221 11DE41          	   108: 	ld de, gamesend
-00:4224 ED52            	   109: 	sbc hl,de
-00:4226 19              	   110: 	add hl,de
-                        	   111: 	
-                        	   112: 	; Loop if HL is less than GamesEnd
-00:4227 38E3            	   113: 	jr c, GamesLoop
-00:4229 C34B42          	   114: 	jp MainLoop
-                        	   115: 
-                        	   116: PrintStr:
-                        	   117: 	; Load first character of string to Reg A
-00:422C 7E              	   118: 	ld a, (hl)
-                        	   119: 	; If 0 detected, this is the end of the string
-00:422D FE00            	   120: 	cp 0
-00:422F C8              	   121: 	ret z
-                        	   122: 	; Otherwise, Increment HL and Put the current value pointed to by HL to the screen and loop
-00:4230 23              	   123: 	inc hl
-00:4231 CDA200          	   124: 	call CHPUT
-00:4234 18F6            	   125: 	jr PrintStr
-                        	   126: 
-                        	   127: PrintPointer:
-00:4236 3A5A42          	   128: 	ld a, (pointerChar)
-00:4239 CDA200          	   129: 	call CHPUT
-00:423C C9              	   130: 	ret
-                        	   131: 
-                        	   132: NewLn:
-00:423D F5              	   133: 	push af
-00:423E 3E0D            	   134: 	ld a, 13
-00:4240 CDA200          	   135: 	call CHPUT
-00:4243 3E0A            	   136: 	ld a, 10
-00:4245 CDA200          	   137: 	call CHPUT
-00:4248 F1              	   138: 	pop af
-00:4249 C9              	   139: 	ret
-                        	   140: 
-                        	   141: 
-                        	   142: CheckInput:
-00:424A 00              	   143: 	nop
+                        	    95: 	
+                        	    96: 	;; Compare the two, if equal, then print the pointer, else continue
+                        	    97: 
+                        	    98: 	;; Restore HL
+                        	    99: 
+                        	   100: 	
+                        	   101: 	; Print Current Game Name and a new line
+00:421A CD2F42          	   102: 	call PrintStr
+00:421D CD4242          	   103: 	call NewLn
+                        	   104: 	
+                        	   105: 	; Compare HL to GamesEnd
+00:4220 3E00            	   106: 	ld a, 0
+00:4222 B7              	   107: 	or a	; Clears Carry Flag
+00:4223 23              	   108: 	inc hl
+00:4224 11DE41          	   109: 	ld de, gamesend
+00:4227 ED52            	   110: 	sbc hl,de
+00:4229 19              	   111: 	add hl,de
+                        	   112: 	
+                        	   113: 	; Loop if HL is less than GamesEnd
+00:422A 38E0            	   114: 	jr c, GamesLoop
+00:422C C35042          	   115: 	jp MainLoop
+                        	   116: 
+                        	   117: PrintStr:
+                        	   118: 	; Load first character of string to Reg A
+00:422F 7E              	   119: 	ld a, (hl)
+                        	   120: 	; If 0 detected, this is the end of the string
+00:4230 FE00            	   121: 	cp 0
+00:4232 C8              	   122: 	ret z
+                        	   123: 	; Otherwise, Increment HL and Put the current value pointed to by HL to the screen and loop
+00:4233 23              	   124: 	inc hl
+00:4234 CDA200          	   125: 	call CHPUT
+00:4237 18F6            	   126: 	jr PrintStr
+                        	   127: 
+                        	   128: PrintPointer:
+00:4239 F5              	   129: 	push af
+00:423A 3A5F42          	   130: 	ld a, (pointerChar)
+00:423D CDA200          	   131: 	call CHPUT
+00:4240 F1              	   132: 	pop af
+00:4241 C9              	   133: 	ret
+                        	   134: 
+                        	   135: NewLn:
+00:4242 F5              	   136: 	push af
+00:4243 3E0D            	   137: 	ld a, 13
+00:4245 CDA200          	   138: 	call CHPUT
+00:4248 3E0A            	   139: 	ld a, 10
+00:424A CDA200          	   140: 	call CHPUT
+00:424D F1              	   141: 	pop af
+00:424E C9              	   142: 	ret
+                        	   143: 
                         	   144: 
-                        	   145: MainLoop:
-00:424B F3              	   146: 	di
-00:424C 18FC            	   147: 	jr CheckInput
-                        	   148: 	
-                        	   149: 
-00:424E 202E2E          	   150: goBack:	 db " ..",0
-00:4251 00
-00:4252 2047616D65732F  	   151: dirName: db " Games/",0
-00:4259 00
-                        	   152: pointerChar:
-00:425A 3E              	   153: 	db ">",0
-00:425B 00
-                        	   154: 
-                        	   155: 
-                        	   156: selectorIndex:
-00:425C 00              	   157: 	db 0
-                        	   158: currentGame:
-00:425D 0000            	   159: 	dw 0
-                        	   160: 
-                        	   161: loopIndex:
-00:425F 00              	   162: 	db 0
-                        	   163: currentPage:
-00:4260 00              	   164: 	db 0
+                        	   145: CheckInput:
+00:424F 00              	   146: 	nop
+                        	   147: 
+                        	   148: MainLoop:
+00:4250 F3              	   149: 	di
+00:4251 18FC            	   150: 	jr CheckInput
+                        	   151: 	
+                        	   152: 
+00:4253 202E2E          	   153: goBack:	 db " ..",0
+00:4256 00
+00:4257 2047616D65732F  	   154: dirName: db " Games/",0
+00:425E 00
+                        	   155: pointerChar:
+00:425F 3E              	   156: 	db ">"
+                        	   157: 
+                        	   158: 
+                        	   159: selectorIndex:
+00:4260 00              	   160: 	db 0
+                        	   161: currentGame:
+00:4261 0000            	   162: 	dw 0
+                        	   163: 
+                        	   164: loopIndex:
+00:4263 00              	   165: 	db 0
+                        	   166: currentPage:
+00:4264 00              	   167: 	db 0
 
 
 Symbols by name:
 BAKCLR                           E:F3EA
 BDCLR                            E:F3EB
 CHCOLOR                          E:0062
-CheckInput                       A:424A
+CheckInput                       A:424F
 CHMOD                            E:005F
 CHPUT                            E:00A2
-currentGame                      A:425D
-currentPage                      A:4260
-dirName                          A:4252
+currentGame                      A:4261
+currentPage                      A:4264
+dirName                          A:4257
 FileStart                        A:41DF
 games                            A:4010
 gamesend                         A:41DE
 GamesLoop                        A:420C
-goBack                           A:424E
-loopIndex                        A:425F
+goBack                           A:4253
+loopIndex                        A:4263
 Main                             A:41DF
-MainLoop                         A:424B
-NewLn                            A:423D
+MainLoop                         A:4250
+NewLn                            A:4242
 ORGADR                           E:4000
-pointerChar                      A:425A
-PrintPointer                     A:4236
-PrintStr                         A:422C
-selectorIndex                    A:425C
+pointerChar                      A:425F
+PrintPointer                     A:4239
+PrintStr                         A:422F
+selectorIndex                    A:4260
 
 Symbols by value:
 005F CHMOD
@@ -275,17 +277,17 @@ Symbols by value:
 41DF FileStart
 41DF Main
 420C GamesLoop
-422C PrintStr
-4236 PrintPointer
-423D NewLn
-424A CheckInput
-424B MainLoop
-424E goBack
-4252 dirName
-425A pointerChar
-425C selectorIndex
-425D currentGame
-425F loopIndex
-4260 currentPage
+422F PrintStr
+4239 PrintPointer
+4242 NewLn
+424F CheckInput
+4250 MainLoop
+4253 goBack
+4257 dirName
+425F pointerChar
+4260 selectorIndex
+4261 currentGame
+4263 loopIndex
+4264 currentPage
 F3EA BAKCLR
 F3EB BDCLR

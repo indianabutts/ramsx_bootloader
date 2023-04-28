@@ -9,9 +9,15 @@ CHCOLOR equ $0062
 FORCLR equ $F3E9
 BAKCLR equ $F3EA
 BDCLR equ $F3EB
-RomSize equ $4000
 
-GameEntrySize equ 176
+KBDROW equ $AA
+KBDDATA equ $A9
+KEYS	EQU	$FBE5
+
+selectorIndex equ $C001
+currentGame equ $C003
+loopIndex equ $C005
+currentPage equ $C006
 
 				; ==[ Header ]==============================================
 
@@ -51,7 +57,8 @@ gamesend:
 
 FileStart:
 Main:
-
+	ld hl, 8
+	ld (KBDROW), hl
 	; Set Screen Mode to 0
 	ld a, 0
 	call CHMOD
@@ -152,14 +159,30 @@ NewLn:
 	call CHPUT
 	pop af
 	ret
-
-
+IncrementSelector:
+	ld hl, (selectorIndex)
+	inc hl
+	ld (selectorIndex), hl
+	call GamesLoop
 CheckInput:
-	nop
+	ld a, (KEYS+8)
+	bit 6, a
+	call z, IncrementSelector
+	
+	; ld b, 8
+	; in a, (KBDROW)
+	; and $F0
+	; or b
+	; out ($AA), a
+	; in a,($A9)
+	; bit 6, a
+	; call z, IncrementSelector
+
+
 
 MainLoop:
 	di
-	jr CheckInput
+	jp CheckInput
 	
 
 goBack:	 db " ..",0
@@ -168,13 +191,14 @@ pointerChar:
 	db ">"
 
 
-	org $C000
-selectorIndex:
-	db 0
-currentGame:
-	dw 0
+;; Variables to store in RAM
+;;	org $C000
+; selectorIndex:
+; 	db 0
+; currentGame:
+; 	dw 0
 
-loopIndex:
-	db 0
-currentPage:
-	db 0
+; loopIndex:
+; 	db 0
+; currentPage:
+; 	db 0

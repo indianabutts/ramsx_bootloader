@@ -3,6 +3,12 @@
 ORGADR  equ $4000
 CHPUT   equ $00A2
 CHMOD   equ $005f
+
+CHCOLOR equ $0062
+
+FORCLR equ $F3E9
+BAKCLR equ $F3EA
+BDCLR equ $F3EB
 RomSize equ $4000
 	
 
@@ -20,8 +26,14 @@ RomSize equ $4000
 FileStart:
 Main:
 				; set VDP to screen 0
+
 	ld a, 0
 	call CHMOD
+	ld a, 1
+
+	ld (BAKCLR), a
+	ld (BDCLR), a
+	call CHCOLOR
 	ld hl, dirName
 	call PrintStr
 	call NewLn
@@ -99,9 +111,3 @@ selectorIndex:
 
 currentPage:
 	db 0
-				
-; ==[ ROM Padding ]=============================================
-
-; FileEnd:
-; 	ds $4000 + RomSize - FileEnd, 255
-

@@ -1,0 +1,291 @@
+Sections:
+00: "seg4000" (4000-4261)
+
+
+Source: "./main.asm"
+                        	     1: 				; ==[ Constants ]============================================
+                        	     2: 
+                        	     3: ORGADR  equ $4000
+                        	     4: CHPUT   equ $00A2
+                        	     5: CHMOD   equ $005f
+                        	     6: 
+                        	     7: CHCOLOR equ $0062
+                        	     8: 
+                        	     9: FORCLR equ $F3E9
+                        	    10: BAKCLR equ $F3EA
+                        	    11: BDCLR equ $F3EB
+                        	    12: RomSize equ $4000
+                        	    13: 
+                        	    14: GameEntrySize equ 176
+                        	    15: 
+                        	    16: 				; ==[ Header ]==============================================
+                        	    17: 
+                        	    18: 				; Place header inside the binary.
+                        	    19: 	org ORGADR
+                        	    20: 				; ROM header
+00:4000 4142            	    21: 	db "AB"
+00:4002 DF41            	    22: 	dw Main
+00:4004 0000            	    23: 	dw 0, 0, 0, 0, 0, 0
+00:4006 0000
+00:4008 0000
+00:400A 0000
+00:400C 0000
+00:400E 0000
+                        	    24: 
+                        	    25: 
+                        	    26: games:
+00:4010 2031302059617264	    27: 	db " 10 Yard Fight (1986)", 0
+00:4018 2046696768742028
+00:4020 3139383629
+00:4025 00
+00:4026 2031393432202831	    28: 	db " 1942 (1986)(ASCII)(J", 0
+00:402E 3938362928415343
+00:4036 494929284A
+00:403B 00
+00:403C 2031393432202831	    29: 	db " 1942 (1987)(Zemina)(", 0
+00:4044 39383729285A656D
+00:404C 696E612928
+00:4051 00
+00:4052 20334420476F6C66	    30: 	db " 3D Golf Simulation -", 0
+00:405A 2053696D756C6174
+00:4062 696F6E202D
+00:4067 00
+00:4068 20334420476F6C66	    31: 	db " 3D Golf Simulation -", 0
+00:4070 2053696D756C6174
+00:4078 696F6E202D
+00:407D 00
+00:407E 2033442054656E6E	    32: 	db " 3D Tennis (1983)(ASC", 0
+00:4086 6973202831393833
+00:408E 2928415343
+00:4093 00
+00:4094 2033442057617465	    33: 	db " 3D Water Driver (198", 0
+00:409C 7220447269766572
+00:40A4 2028313938
+00:40A9 00
+00:40AA 2041204C69666520	    34: 	db " A Life M36 Planet - ", 0
+00:40B2 4D333620506C616E
+00:40BA 6574202D20
+00:40BF 00
+00:40C0 20412E452E202831	    35: 	db " A.E. (1983)(Toshiba-", 0
+00:40C8 3938332928546F73
+00:40D0 686962612D
+00:40D5 00
+00:40D6 2041312053706972	    36: 	db " A1 Spirit - The Way ", 0
+00:40DE 6974202D20546865
+00:40E6 2057617920
+00:40EB 00
+00:40EC 204163746D616E20	    37: 	db " Actman (1984)(ASCII)", 0
+00:40F4 2831393834292841
+00:40FC 5343494929
+00:4101 00
+00:4102 20416476656E2763	    38: 	db " Adven'chuta! (1983)(", 0
+00:410A 6875746121202831
+00:4112 3938332928
+00:4117 00
+00:4118 20416C63617A6172	    39: 	db " Alcazar - The Forgot", 0
+00:4120 202D205468652046
+00:4128 6F72676F74
+00:412D 00
+00:412E 20416C6962616261	    40: 	db " Alibaba and 40 Thiev", 0
+00:4136 20616E6420343020
+00:413E 5468696576
+00:4143 00
+00:4144 20416C69656E2038	    41: 	db " Alien 8 (1985)(Ultim", 0
+00:414C 2028313938352928
+00:4154 556C74696D
+00:4159 00
+00:415A 20416C69656E2038	    42: 	db " Alien 8 (1986)(Nippo", 0
+00:4162 2028313938362928
+00:416A 4E6970706F
+00:416F 00
+00:4170 20416C69656E732E	    43: 	db " Aliens. Alien 2 (198", 0
+00:4178 20416C69656E2032
+00:4180 2028313938
+00:4185 00
+00:4186 20416C7068612052	    44: 	db " Alpha Roid (1986)(Po", 0
+00:418E 6F69642028313938
+00:4196 362928506F
+00:419B 00
+00:419C 20416C7068612053	    45: 	db " Alpha Squadron (1985", 0
+00:41A4 71756164726F6E20
+00:41AC 2831393835
+00:41B1 00
+00:41B2 20416D6572696361	    46: 	db " American Truck (1986", 0
+00:41BA 6E20547275636B20
+00:41C2 2831393836
+00:41C7 00
+00:41C8 20416D6572696361	    47: 	db " American Truck (1986", 0
+00:41D0 6E20547275636B20
+00:41D8 2831393836
+00:41DD 00
+                        	    48: gamesend:
+00:41DE 00              	    49: 	nop
+                        	    50: 				; ==[ Program ]=============================================
+                        	    51: 
+                        	    52: FileStart:
+                        	    53: Main:
+                        	    54: 
+                        	    55: 	; Set Screen Mode to 0
+00:41DF 3E00            	    56: 	ld a, 0
+00:41E1 CD5F00          	    57: 	call CHMOD
+                        	    58: 	; Set Pallette to White on Black
+00:41E4 3E01            	    59: 	ld a, 1
+00:41E6 32EAF3          	    60: 	ld (BAKCLR), a
+00:41E9 32EBF3          	    61: 	ld (BDCLR), a
+00:41EC CD6200          	    62: 	call CHCOLOR
+                        	    63: 	; Dummy Dir Name and Go Back to determine maximum games in list
+00:41EF 215242          	    64: 	ld hl, dirName
+00:41F2 CD2C42          	    65: 	call PrintStr
+00:41F5 CD3D42          	    66: 	call NewLn
+00:41F8 214E42          	    67: 	ld hl, goBack
+00:41FB CD2C42          	    68: 	call PrintStr
+00:41FE CD3D42          	    69: 	call NewLn
+                        	    70: 	; Load start address for Games List
+00:4201 211040          	    71: 	ld hl,games
+                        	    72: 	; ld (currentGame), hl
+                        	    73: 	; Load end address for Games List
+00:4204 11DE41          	    74: 	ld de, gamesend
+                        	    75: 	; Initialize Loop Index to 0
+00:4207 3E00            	    76: 	ld a, 0 
+00:4209 325F42          	    77: 	ld (loopIndex), a
+                        	    78: 
+                        	    79: GamesLoop:
+                        	    80: 	; Put Pointer Character if LoopIndex is Equ to PointerIndex
+                        	    81: 	
+                        	    82: 	;; Store the current HL
+00:420C E5              	    83: 	push hl
+                        	    84: 
+                        	    85: 	;; Get the LoopIndex	
+00:420D 215F42          	    86: 	ld hl, loopIndex
+00:4210 7E              	    87: 	ld a, (hl)
+                        	    88: 	;; Get the Pointer Index
+00:4211 215C42          	    89: 	ld hl, selectorIndex
+00:4214 4E              	    90: 	ld c, (hl)
+00:4215 B9              	    91: 	cp c
+00:4216 E1              	    92: 	pop hl
+                        	    93: 	
+                        	    94: 	
+                        	    95: 	;; Compare the two, if equal, then print the pointer, else continue
+                        	    96: 
+                        	    97: 	;; Restore HL
+                        	    98: 
+                        	    99: 	
+                        	   100: 	; Print Current Game Name and a new line
+00:4217 CD2C42          	   101: 	call PrintStr
+00:421A CD3D42          	   102: 	call NewLn
+                        	   103: 	
+                        	   104: 	; Compare HL to GamesEnd
+00:421D 3E00            	   105: 	ld a, 0
+00:421F B7              	   106: 	or a	; Clears Carry Flag
+00:4220 23              	   107: 	inc hl
+00:4221 11DE41          	   108: 	ld de, gamesend
+00:4224 ED52            	   109: 	sbc hl,de
+00:4226 19              	   110: 	add hl,de
+                        	   111: 	
+                        	   112: 	; Loop if HL is less than GamesEnd
+00:4227 38E3            	   113: 	jr c, GamesLoop
+00:4229 C34B42          	   114: 	jp MainLoop
+                        	   115: 
+                        	   116: PrintStr:
+                        	   117: 	; Load first character of string to Reg A
+00:422C 7E              	   118: 	ld a, (hl)
+                        	   119: 	; If 0 detected, this is the end of the string
+00:422D FE00            	   120: 	cp 0
+00:422F C8              	   121: 	ret z
+                        	   122: 	; Otherwise, Increment HL and Put the current value pointed to by HL to the screen and loop
+00:4230 23              	   123: 	inc hl
+00:4231 CDA200          	   124: 	call CHPUT
+00:4234 18F6            	   125: 	jr PrintStr
+                        	   126: 
+                        	   127: PrintPointer:
+00:4236 3A5A42          	   128: 	ld a, (pointerChar)
+00:4239 CDA200          	   129: 	call CHPUT
+00:423C C9              	   130: 	ret
+                        	   131: 
+                        	   132: NewLn:
+00:423D F5              	   133: 	push af
+00:423E 3E0D            	   134: 	ld a, 13
+00:4240 CDA200          	   135: 	call CHPUT
+00:4243 3E0A            	   136: 	ld a, 10
+00:4245 CDA200          	   137: 	call CHPUT
+00:4248 F1              	   138: 	pop af
+00:4249 C9              	   139: 	ret
+                        	   140: 
+                        	   141: 
+                        	   142: CheckInput:
+00:424A 00              	   143: 	nop
+                        	   144: 
+                        	   145: MainLoop:
+00:424B F3              	   146: 	di
+00:424C 18FC            	   147: 	jr CheckInput
+                        	   148: 	
+                        	   149: 
+00:424E 202E2E          	   150: goBack:	 db " ..",0
+00:4251 00
+00:4252 2047616D65732F  	   151: dirName: db " Games/",0
+00:4259 00
+                        	   152: pointerChar:
+00:425A 3E              	   153: 	db ">",0
+00:425B 00
+                        	   154: 
+                        	   155: 
+                        	   156: selectorIndex:
+00:425C 00              	   157: 	db 0
+                        	   158: currentGame:
+00:425D 0000            	   159: 	dw 0
+                        	   160: 
+                        	   161: loopIndex:
+00:425F 00              	   162: 	db 0
+                        	   163: currentPage:
+00:4260 00              	   164: 	db 0
+
+
+Symbols by name:
+BAKCLR                           E:F3EA
+BDCLR                            E:F3EB
+CHCOLOR                          E:0062
+CheckInput                       A:424A
+CHMOD                            E:005F
+CHPUT                            E:00A2
+currentGame                      A:425D
+currentPage                      A:4260
+dirName                          A:4252
+FileStart                        A:41DF
+games                            A:4010
+gamesend                         A:41DE
+GamesLoop                        A:420C
+goBack                           A:424E
+loopIndex                        A:425F
+Main                             A:41DF
+MainLoop                         A:424B
+NewLn                            A:423D
+ORGADR                           E:4000
+pointerChar                      A:425A
+PrintPointer                     A:4236
+PrintStr                         A:422C
+selectorIndex                    A:425C
+
+Symbols by value:
+005F CHMOD
+0062 CHCOLOR
+00A2 CHPUT
+4000 ORGADR
+4010 games
+41DE gamesend
+41DF FileStart
+41DF Main
+420C GamesLoop
+422C PrintStr
+4236 PrintPointer
+423D NewLn
+424A CheckInput
+424B MainLoop
+424E goBack
+4252 dirName
+425A pointerChar
+425C selectorIndex
+425D currentGame
+425F loopIndex
+4260 currentPage
+F3EA BAKCLR
+F3EB BDCLR

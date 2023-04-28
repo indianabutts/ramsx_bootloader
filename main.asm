@@ -10,7 +10,8 @@ FORCLR equ $F3E9
 BAKCLR equ $F3EA
 BDCLR equ $F3EB
 RomSize equ $4000
-	
+
+GameEntrySize equ 176
 
 				; ==[ Header ]==============================================
 
@@ -21,66 +22,7 @@ RomSize equ $4000
 	dw Main
 	dw 0, 0, 0, 0, 0, 0
 
-				; ==[ Program ]=============================================
 
-FileStart:
-Main:
-				; set VDP to screen 0
-
-	ld a, 0
-	call CHMOD
-	ld a, 1
-
-	ld (BAKCLR), a
-	ld (BDCLR), a
-	call CHCOLOR
-	ld hl, dirName
-	call PrintStr
-	call NewLn
-	ld hl, goBack
-	call PrintStr
-	call NewLn
-	ld hl,games
-	ld de, gamesend
-
-GamesLoop:
-	call PrintStr
-	call NewLn
-	inc hl
-	inc b
-	or a
-	sbc hl,de
-	add hl,de
-	jr c, GamesLoop
-	call Finished
-	
-PrintStr:
-	ld a, (hl)
-	cp 0
-	ret z
-	inc hl
-	call CHPUT
-	jr PrintStr
-
-NewLn:
-	push af
-	ld a, 13
-	call CHPUT
-	ld a, 10
-	call CHPUT
-	pop af
-	ret
-
-Finished:
-	di
-	halt
-
-goBack:	 db " ..",0
-dirName: db " Games/",0
-pointerChar:
-	db ">",0
-emptyPointer:
-	db " ",0
 games:
 	db " 10 Yard Fight (1986)", 0
 	db " 1942 (1986)(ASCII)(J", 0
@@ -105,9 +47,118 @@ games:
 	db " American Truck (1986", 0
 gamesend:
 	nop
+				; ==[ Program ]=============================================
+
+FileStart:
+Main:
+
+	; Set Screen Mode to 0
+	ld a, 0
+	call CHMOD
+	; Set Pallette to White on Black
+	ld a, 1
+	ld (BAKCLR), a
+	ld (BDCLR), a
+	call CHCOLOR
+	; Dummy Dir Name and Go Back to determine maximum games in list
+	ld hl, dirName
+	call PrintStr
+	call NewLn
+	ld hl, goBack
+	call PrintStr
+	call NewLn
+	; Load start address for Games List
+	ld hl,games
+	; ld (currentGame), hl
+	; Load end address for Games List
+	ld de, gamesend
+	; Initialize Loop Index to 0
+	ld a, 0 
+	ld (loopIndex), a
+
+GamesLoop:
+	; Put Pointer Character if LoopIndex is Equ to PointerIndex
+	
+	;; Store the current HL
+	push hl
+
+	;; Get the LoopIndex	
+	ld hl, loopIndex
+	ld a, (hl)
+	;; Get the Pointer Index
+	ld hl, selectorIndex
+	ld c, (hl)
+	cp c
+	pop hl
+	
+	
+	;; Compare the two, if equal, then print the pointer, else continue
+
+	;; Restore HL
+
+	
+	; Print Current Game Name and a new line
+	call PrintStr
+	call NewLn
+	
+	; Compare HL to GamesEnd
+	ld a, 0
+	or a	; Clears Carry Flag
+	inc hl
+	ld de, gamesend
+	sbc hl,de
+	add hl,de
+	
+	; Loop if HL is less than GamesEnd
+	jr c, GamesLoop
+	jp MainLoop
+
+PrintStr:
+	; Load first character of string to Reg A
+	ld a, (hl)
+	; If 0 detected, this is the end of the string
+	cp 0
+	ret z
+	; Otherwise, Increment HL and Put the current value pointed to by HL to the screen and loop
+	inc hl
+	call CHPUT
+	jr PrintStr
+
+PrintPointer:
+	ld a, (pointerChar)
+	call CHPUT
+	ret
+
+NewLn:
+	push af
+	ld a, 13
+	call CHPUT
+	ld a, 10
+	call CHPUT
+	pop af
+	ret
+
+
+CheckInput:
+	nop
+
+MainLoop:
+	di
+	jr CheckInput
+	
+
+goBack:	 db " ..",0
+dirName: db " Games/",0
+pointerChar:
+	db ">",0
+
 
 selectorIndex:
 	db 0
+currentGame:
+	dw 0
 
+loopIndex:
+	db 0
 currentPage:
 	db 0

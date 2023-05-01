@@ -3,12 +3,14 @@
 ORGADR  equ $4000
 CHPUT   equ $00A2
 CHMOD   equ $005f
-
+CHGET equ $009F
 CHCOLOR equ $0062
 
 FORCLR equ $F3E9
 BAKCLR equ $F3EA
 BDCLR equ $F3EB
+
+CLS equ $00C3
 
 KBDROW equ $AA
 KBDDATA equ $A9
@@ -25,38 +27,36 @@ currentPage equ $C006
 	org ORGADR
 				; ROM header
 	db "AB"
-	dw Main
+	dw Init
 	dw 0, 0, 0, 0, 0, 0
 
 
 games:
-	db "10 Yard Fight (1986)", 0
-	db "1942 (1986)(ASCII)(J", 0
-	db "1942 (1987)(Zemina)(", 0
-	db "3D Golf Simulation -", 0
-	db "3D Golf Simulation -", 0
-	db "3D Tennis (1983)(ASC", 0
-	db "3D Water Driver (198", 0
-	db "A Life M36 Planet - ", 0
-	db "A.E. (1983)(Toshiba-", 0
-	db "A1 Spirit - The Way ", 0
-	db "Actman (1984)(ASCII)", 0
-	db "Adven'chuta! (1983)(", 0
-	db "Alcazar - The Forgot", 0
-	db "Alibaba and 40 Thiev", 0
-	db "Alien 8 (1985)(Ultim", 0
-	db "Alien 8 (1986)(Nippo", 0
-	db "Aliens. Alien 2 (198", 0
-	db "Alpha Roid (1986)(Po", 0
-	db "Alpha Squadron (1985", 0
-	db "American Truck (1986", 0
-	db "American Truck (1986", 0
+	db "10 Yard Fight (1986)   128kb", 0
+	db "1942 (1986)(ASCII)(J   128kb", 0
+	db "1942 (1987)(Zemina)(   128kb", 0
+	db "3D Golf Simulation -   128kb", 0
+	db "3D Golf Simulation -   128kb", 0
+	db "3D Tennis (1983)(ASC   128kb", 0
+	db "3D Water Driver (198   128kb", 0
+	db "A Life M36 Planet -    128kb", 0
+	db "A.E. (1983)(Toshiba-   128kb", 0
+	db "A1 Spirit - The Way    128kb", 0
+	db "Actman (1984)(ASCII)   128kb", 0
+	db "Adven'chuta! (1983)(   128kb", 0
+	db "Alcazar - The Forgot   128kb", 0
+	db "Alibaba and 40 Thiev   128kb", 0
+	db "Alien 8 (1985)(Ultim   128kb", 0
+	db "Alien 8 (1986)(Nippo   128kb", 0
+	db "Aliens. Alien 2 (198   128kb", 0
+	db "Alpha Roid (1986)(Po   128kb", 0
+	db "Alpha Squadron (1985   128kb", 0
+	db "American Truck (1986   128kb", 0
+	db "American Truck (1986   128kb", 0
 gamesend:
 	nop
 				; ==[ Program ]=============================================
-
-FileStart:
-Main:
+Init:
 	ld hl, 8
 	ld (KBDROW), hl
 	; Set Screen Mode to 0
@@ -67,7 +67,10 @@ Main:
 	ld (BAKCLR), a
 	ld (BDCLR), a
 	call CHCOLOR
-	; Dummy Dir Name and Go Back to determine maximum games in list
+	
+InitGameLoop:
+; Dummy Dir Name and Go Back to determine maximum games in list
+	call CLS
 	ld hl, dirName
 	call PrintStr
 	call NewLn
@@ -79,6 +82,7 @@ Main:
 	; ld (currentGame), hl
 	; Load end address for Games List
 	ld de, gamesend
+	
 	; Initialize Loop Index to 0
 	ld a, 0 
 	ld (loopIndex), a
@@ -144,6 +148,7 @@ PrintPointer:
 	call CHPUT
 	pop af
 	ret
+	
 PrintSpace:
 	push af,
 	ld a, $20
@@ -159,46 +164,35 @@ NewLn:
 	call CHPUT
 	pop af
 	ret
+
 IncrementSelector:
 	ld hl, (selectorIndex)
 	inc hl
 	ld (selectorIndex), hl
-	call GamesLoop
+	ret
+
+DecrementSelector:
+	ld hl, (selectorIndex)
+	dec hl
+	ld (selectorIndex), hl
+	ret
+
 CheckInput:
-	ld a, (KEYS+8)
-	bit 6, a
+	call CHGET
+	cp 30
+	call z, DecrementSelector
+	cp 31
 	call z, IncrementSelector
-	
-	; ld b, 8
-	; in a, (KBDROW)
-	; and $F0
-	; or b
-	; out ($AA), a
-	; in a,($A9)
-	; bit 6, a
-	; call z, IncrementSelector
-
-
+	ret
 
 MainLoop:
 	di
-	jp CheckInput
+	call CheckInput
+	call InitGameLoop
+	
 	
 
 goBack:	 db " ..",0
 dirName: db " Games/",0
 pointerChar:
 	db ">"
-
-
-;; Variables to store in RAM
-;;	org $C000
-; selectorIndex:
-; 	db 0
-; currentGame:
-; 	dw 0
-
-; loopIndex:
-; 	db 0
-; currentPage:
-; 	db 0

@@ -72,8 +72,9 @@ Init:
 	
 InitGameLoop:
 ; Dummy Dir Name and Go Back to determine maximum games in list
+	xor a
 	call CLS
-	ld hl, dirName
+	ld hl, version
 	call PrintStr
 	call NewLn
 	ld hl, goBack
@@ -193,7 +194,7 @@ MainLoop:
 	call InitGameLoop
 	
 	
-
+version: db " Implication Station v0.1",0
 goBack:	 db " ..",0
 dirName: db " Games/",0
 pointerChar:

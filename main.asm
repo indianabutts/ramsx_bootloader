@@ -14,7 +14,9 @@ CLS equ $00C3
 
 KBDROW equ $AA
 KBDDATA equ $A9
-KEYS	EQU	$FBE5
+KEYS	equ	$FBE5
+UP_CODE equ $1E
+DOWN_CODE equ $1F	
 
 selectorIndex equ $C001
 currentGame equ $C003
@@ -32,27 +34,27 @@ currentPage equ $C006
 
 
 games:
-	db "10 Yard Fight (1986)   128kb", 0
-	db "1942 (1986)(ASCII)(J   128kb", 0
-	db "1942 (1987)(Zemina)(   128kb", 0
-	db "3D Golf Simulation -   128kb", 0
-	db "3D Golf Simulation -   128kb", 0
-	db "3D Tennis (1983)(ASC   128kb", 0
-	db "3D Water Driver (198   128kb", 0
-	db "A Life M36 Planet -    128kb", 0
-	db "A.E. (1983)(Toshiba-   128kb", 0
+	db "10 Yard Fight (1986)     8kb", 0
+	db "1942 (1986)(ASCII)(J     8kb", 0
+	db "1942 (1987)(Zemina)(     8kb", 0
+	db "3D Golf Simulation -    16kb", 0
+	db "3D Golf Simulation -    32kb", 0
+	db "3D Tennis (1983)(ASC    32kb", 0
+	db "3D Water Driver (198    64kb", 0
+	db "A Life M36 Planet -     64kb", 0
+	db "A.E. (1983)(Toshiba-    64kb", 0
 	db "A1 Spirit - The Way    128kb", 0
 	db "Actman (1984)(ASCII)   128kb", 0
 	db "Adven'chuta! (1983)(   128kb", 0
 	db "Alcazar - The Forgot   128kb", 0
-	db "Alibaba and 40 Thiev   128kb", 0
-	db "Alien 8 (1985)(Ultim   128kb", 0
-	db "Alien 8 (1986)(Nippo   128kb", 0
-	db "Aliens. Alien 2 (198   128kb", 0
-	db "Alpha Roid (1986)(Po   128kb", 0
-	db "Alpha Squadron (1985   128kb", 0
-	db "American Truck (1986   128kb", 0
-	db "American Truck (1986   128kb", 0
+	db "Alibaba and 40 Thiev   256kb", 0
+	db "Alien 8 (1985)(Ultim   256kb", 0
+	db "Alien 8 (1986)(Nippo   256kb", 0
+	db "Aliens. Alien 2 (198   512kb", 0
+	db "Alpha Roid (1986)(Po   512kb", 0
+	db "Alpha Squadron (1985   512kb", 0
+	db "American Truck (1986   512kb", 0
+	db "American Truck (1986   512kb", 0
 gamesend:
 	nop
 				; ==[ Program ]=============================================

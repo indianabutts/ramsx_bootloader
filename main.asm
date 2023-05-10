@@ -16,7 +16,9 @@ KBDROW equ $AA
 KBDDATA equ $A9
 KEYS	equ	$FBE5
 UP_CODE equ $1E
-DOWN_CODE equ $1F	
+DOWN_CODE equ $1F
+
+SPACE_CHAR equ $20
 
 selectorIndex equ $C001
 currentGame equ $C003
@@ -106,7 +108,7 @@ GamesLoop:
 	ld hl, (loopIndex)
 	ld a, l
 	cp c
-	call z, PrintPointer
+	call z, PrintInitialPointer
 	call nz, PrintSpace
 	inc hl
 	ld (loopIndex), hl
@@ -145,7 +147,7 @@ PrintStr:
 	call CHPUT
 	jr PrintStr
 
-PrintPointer:
+PrintInitialPointer:
 	push af
 	ld a, (pointerChar)
 	call CHPUT
@@ -171,15 +173,29 @@ NewLn:
 IncrementSelector:
 	ld hl, (selectorIndex)
 	inc hl
+	ld a, l
+	cp $15
+	call z, ClampSelector
 	ld (selectorIndex), hl
 	ret
 
 DecrementSelector:
 	ld hl, (selectorIndex)
 	dec hl
+	ld a, l
+	cp $FF
+	call z, ZeroSelector
 	ld (selectorIndex), hl
 	ret
 
+ZeroSelector:
+	ld hl, 0
+	ret
+
+ClampSelector:
+	ld hl, $14
+	ret
+	
 CheckInput:
 	call CHGET
 	cp 30

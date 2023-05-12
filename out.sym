@@ -100,21 +100,32 @@ Source: "WORKING_VARIABLES.asm"
                         	     4: CUR_PAGE:	equ $C004	; The page number
                         	     5: VRM_WRK_AREA:	equ $C100	; Base address for the RAM copy of the VRAM Buffer
                         	     6: 
-                        	     7: COM_ACTION_REG:	equ $6FF0	; The command is written here for the Firmware to read
-                        	     8: COM_INDEX_REG:	equ $6FF1	; The index for the ROM to load in the current page
-                        	     9: COM_ACK_REG:	equ $6FFE	; The Firmware will write the ACK value here for Bootloader to check
-                        	    10: 
 
 Source: "./main.asm"
-                        	     8: 	
-                        	     9: ORGADR  equ $4000
-                        	    10: 	
-                        	    11: 	include "CART_HEADER.asm"
+                        	     8: 	include "CONSTANTS.asm"
+
+Source: "CONSTANTS.asm"
+                        	     1: ORGADDR	equ $4000	; Origin for the ROM
+                        	     2: COM_ACTION_REG:	equ $6FF0	; The command is written here for the Firmware to read
+                        	     3: COM_INDEX_REG:	equ $6FF1	; The index for the ROM to load in the current page
+                        	     4: COM_ACK_REG:	equ $6FFE	; The Firmware will write the ACK value here for Bootloader to check
+                        	     5: COM_START:	equ $7000	; Addresses from 0x7000 to 0x7FFF will trigger the command flow on the Firmware
+                        	     6: 
+                        	     7: COM_ACT_PU:	equ $40		; Value for Page Up
+                        	     8: COM_ACT_PD:	equ $4F		; Value for Page Down
+                        	     9: COM_ACT_PROG:	equ $60		; Value for Program
+                        	    10: COM_ACT_DIRIN:	equ $50		; Value for Entering a Dir (Not in v0)
+                        	    11: COM_ACT_DIROUT:	equ $5F		; Value for Backing out of a Dir (Not in v0)
+                        	    12: 
+
+Source: "./main.asm"
+                        	     9: 
+                        	    10: 	include "CART_HEADER.asm"
 
 Source: "CART_HEADER.asm"
                         	     1: ;;; Header for the Cartridge to be recognised by the MSX
                         	     2: 	
-                        	     3: 	org ORGADR
+                        	     3: 	org ORGADDR
                         	     4: 				
 00:4000 4142            	     5: 	db "AB"
 00:4002 D343            	     6: 	dw Init
@@ -127,6 +138,7 @@ Source: "CART_HEADER.asm"
                         	     8: 
 
 Source: "./main.asm"
+                        	    11: 
                         	    12: 	include "VRAM_BUFFER.asm"
 
 Source: "VRAM_BUFFER.asm"
@@ -393,7 +405,7 @@ Source: "./main.asm"
 00:4449 115000          	    88: 	ld de, 80
 00:444C 19              	    89: 	add hl, de
                         	    90: 	;; We then Write the character to the location in RAM
-00:444D 36CF            	    91: 	ld (hl), $CF
+00:444D 36CF            	    91: 	ld (hl), POINTER_CODE
                         	    92: 	;; We repeat for Clearing the OLD_SEL_INDEX
 00:444F 3A02C0          	    93: 	ld a, (OLD_CUR_INDEX)
 00:4452 67              	    94: 	ld h, a
@@ -403,7 +415,7 @@ Source: "./main.asm"
 00:445B 19              	    98: 	add hl, de
 00:445C 115000          	    99: 	ld de, 80
 00:445F 19              	   100: 	add hl, de
-00:4460 3620            	   101: 	ld (hl), $20
+00:4460 3620            	   101: 	ld (hl), SPACE_CODE
 00:4462 C9              	   102: 	ret
                         	   103: 
                         	   104: ;;; Mult h by e and place in hl
@@ -484,7 +496,9 @@ Mult8_8_loop                     A:446C
 Mult8x16                         A:4473
 Mult8x8                          A:4463
 OLD_CUR_INDEX                    E:C002
-ORGADR                           E:4000
+ORGADDR                          E:4000
+POINTER_CODE                     E:00CF
+SPACE_CODE                       E:0020
 TOTAL_PAGES                      A:43D1
 TXTNAM                           E:F3B3
 UpdateCursor                     A:443C
@@ -494,11 +508,13 @@ VRM_WRK_AREA                     E:C100
 ZeroSelector                     A:4487
 
 Symbols by value:
+0020 SPACE_CODE
 005C LDIRVM
 0062 CHGCLR
 006C INITXT
 009F CHGET
-4000 ORGADR
+00CF POINTER_CODE
+4000 ORGADDR
 4010 VRAM_BUFFER
 43D0 VRAM_BUFFER_END
 43D1 TOTAL_PAGES

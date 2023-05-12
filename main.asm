@@ -5,10 +5,10 @@
 	include "SYS_VARIABLES.asm"
 	include "CHAR_CODES.asm"
 	include "WORKING_VARIABLES.asm"
-	
-ORGADR  equ $4000
-	
+	include "CONSTANTS.asm"
+
 	include "CART_HEADER.asm"
+
 	include "VRAM_BUFFER.asm"
 	
 TOTAL_PAGES:
@@ -88,7 +88,7 @@ UpdateCursor:
 	ld de, 80
 	add hl, de
 	;; We then Write the character to the location in RAM
-	ld (hl), $CF
+	ld (hl), POINTER_CODE
 	;; We repeat for Clearing the OLD_SEL_INDEX
 	ld a, (OLD_CUR_INDEX)
 	ld h, a
@@ -98,7 +98,7 @@ UpdateCursor:
 	add hl, de
 	ld de, 80
 	add hl, de
-	ld (hl), $20
+	ld (hl), SPACE_CODE
 	ret
 
 ;;; Mult h by e and place in hl

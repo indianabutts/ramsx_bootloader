@@ -1,6 +1,6 @@
 ;;; Header for the Cartridge to be recognised by the MSX
 	
-	org ORGADR
+	org ORGADDR
 				
 	db "AB"
 	dw Init

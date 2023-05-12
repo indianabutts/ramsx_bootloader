@@ -13,6 +13,8 @@
 	
 TOTAL_PAGES:
 	dw 30
+
+	include "CURSOR_FUNCTIONS.asm"
 				; ==[ Program ]=============================================
 Init:
 	;; Set Screen Mode to 0
@@ -45,61 +47,7 @@ CopyBufferToRam:
 	ldir
 	ret
 	
-IncrementSelector:
-	;; Will need to blank the current selector on the screen before updating the values
-	ld hl, (CUR_INDEX)
-	ld a, l
-	ld (OLD_CUR_INDEX),a
-	inc hl
-	ld a, l
-	cp $15
-	call z, ZeroSelector
-	ld (CUR_INDEX), a
-	call UpdateCursor
-	call CopyWorkBufferToVRAM
-	ret
 
-DecrementSelector:
-	;; Will need to Blank the Current Selector On the screen before updating the value
-	ld hl, (CUR_INDEX)
-	ld a, l
-	ld (OLD_CUR_INDEX),a
-	dec hl
-	ld a, l
-	cp $FF
-	call z, ClampSelector
-	ld (CUR_INDEX), a
-	call UpdateCursor
-	call CopyWorkBufferToVRAM
-	ret
-
-UpdateCursor:
-	;; First we Add the new cursor to the Buffer
-	;; We load the CUR_SEL into de, and multiply it by 40
-	;; to get the row we are on
-	ld a, (CUR_INDEX)
-	ld h, a
-	ld e, 40
-	call Mult8x8
-	;; We then add the base address of the Buffer to the HL result
-	ld de, VRM_WRK_AREA
-	add hl, de
-	;; We finally add a standard offset of 80 to get it started on the right row
-	ld de, 80
-	add hl, de
-	;; We then Write the character to the location in RAM
-	ld (hl), POINTER_CODE
-	;; We repeat for Clearing the OLD_SEL_INDEX
-	ld a, (OLD_CUR_INDEX)
-	ld h, a
-	ld e, 40
-	call Mult8x8
-	ld de, VRM_WRK_AREA
-	add hl, de
-	ld de, 80
-	add hl, de
-	ld (hl), SPACE_CODE
-	ret
 
 ;;; Mult h by e and place in hl
 Mult8x8:
@@ -134,20 +82,13 @@ Mult8_16_loop:
 	djnz Mult8_16_loop
 	ret
 	
-ZeroSelector:
-	xor a
-	ret
-
-ClampSelector:
-	ld a, $14
-	ret
 	
 CheckInput:
 	call CHGET
 	cp 30
-	call z, DecrementSelector
+	call z, DecrementCursor
 	cp 31
-	call z, IncrementSelector
+	call z, IncrementCursor
 	ret
 
 MainLoop:

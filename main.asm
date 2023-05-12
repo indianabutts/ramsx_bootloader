@@ -11,7 +11,9 @@ SCREEN_MEM equ $1800
 FORCLR equ $F3E9
 BAKCLR equ $F3EA
 BDCLR equ $F3EB
-
+	
+TXTNAM equ $F3BD
+	
 CLS equ $00C3
 
 KBDROW equ $AA
@@ -72,13 +74,14 @@ Init:
 	ld a, 1
 	ld (BAKCLR), a
 	ld (BDCLR), a
-	call CHCOLOR	
+	call CHCOLOR
 	
 	
 InitGameLoop:
 ; Dummy Dir Name and Go Back to determine maximum games in list
 	xor a
 	call CLS
+
 	ld hl, version
 	call PrintStr
 	call NewLn
@@ -179,7 +182,7 @@ IncrementSelector:
 	inc hl
 	ld a, l
 	cp $15
-	call z, ZerosSelector
+	call z, ZeroSelector
 	ld (selectorIndex), hl
 	ret
 
@@ -210,8 +213,11 @@ CheckInput:
 	ret
 
 MainLoop:
+	
+	
 	di
-	call CheckInput
+	jr MainLoop
+	call CheckInput		
 	call InitGameLoop
 	
 	

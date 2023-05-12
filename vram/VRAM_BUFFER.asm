@@ -1,5 +1,5 @@
 VRAM_BUFFER:
-	db $c6,"  File                 ",$c6,"   Size    V0.1"
+	db "   File                 ",$c6,"   Size    V0.1"
 	db $c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,0,0,0,0,0
 	db $CF,"10 Yard Fight (1986)   ",$c6,"   8kb         "
 	db " 10 Yard Fight (1986)   ",$c6,"   8kb         "

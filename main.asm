@@ -18,6 +18,9 @@ Init:
 	ld a, 1
 	ld (BAKCLR), a
 	ld (BDCLR), a
+	ld a, 0
+	ld (CUR_SEL_INDEX),a
+	ld (OLD_SEL_INDEX),a
 	call CHGCLR
 	;; Copy the VRAM_BUFFER to RAM so that we can update it
 	call CopyBufferToRam
@@ -71,9 +74,10 @@ UpdateCursor:
 	;; First we Add the new cursor to the Buffer
 	;; We load the CUR_SEL into de, and multiply it by 40
 	;; to get the row we are on
-	ld de, (CUR_SEL_INDEX)
-	ld a, 40
-	call Mult8x16
+	ld a, (CUR_SEL_INDEX)
+	ld h, a
+	ld e, 40
+	call Mult8x8
 	;; We then add the base address of the Buffer to the HL result
 	ld de, VRM_WRK_AREA
 	add hl, de
@@ -83,9 +87,10 @@ UpdateCursor:
 	;; We then Write the character to the location in RAM
 	ld (hl), $CF
 	;; We repeat for Clearing the OLD_SEL_INDEX
-	ld de, (OLD_SEL_INDEX)
-	ld a, 40
-	call Mult8x16
+	ld a, (OLD_SEL_INDEX)
+	ld h, a
+	ld e, 40
+	call Mult8x8
 	ld de, VRM_WRK_AREA
 	add hl, de
 	ld de, 80
@@ -100,6 +105,7 @@ Mult8x8:
 	sbc a, a
 	and e
 	ld l,a
+	ld b, 7
 Mult8_8_loop:
 	add hl, hl
 	jr nc, $+3

@@ -1,9 +1,9 @@
 	include "cursor/CURSOR_CONSTANTS.asm"
 
 Cursor_CheckInput:
-	ld hl,(INPUT_NAV_STATE)
+	ld hl,(INPUT_STATE)
 	ld a, h
-	ld hl, (INPUT_NAV_PREV_STATE)
+	ld hl, (INPUT_PREV_STATE)
 	ld b, h
 	cp b
 	jr z, _Cursor_CheckInput_HeldInput 

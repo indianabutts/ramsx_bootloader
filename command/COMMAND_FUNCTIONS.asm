@@ -1,0 +1,2 @@
+Command_CheckInput:
+	nop

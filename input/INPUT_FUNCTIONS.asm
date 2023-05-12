@@ -1,7 +1,7 @@
 Input_UpdateInputBuffers:	
 	;; Set Previous State to the last current state before check
-	ld hl, (INPUT_NAV_STATE)
-	ld (INPUT_NAV_PREV_STATE), hl
+	ld hl, (INPUT_STATE)
+	ld (INPUT_PREV_STATE), hl
 	;; Copy Previous State into B for Comparison later
 	
 	;; Call SNSMAT to get the state for the ROW
@@ -12,22 +12,22 @@ Input_UpdateInputBuffers:
 	ld a, INPUT_COM_ROW
 	call SNSMAT
 	ld l, a
-	ld (INPUT_NAV_STATE), hl
+	ld (INPUT_STATE), hl
 	;; Compare New State in A with Previous State in B
 	ret
 	
-_CheckNavInput_ClearRep
+_Input_ClearRepeat:	
 	ld a, 0
 	ld (INPUT_CUR_REP_COUNT), a
 	ret
 	
-IncrementInputRepeat:
+_Input_IncrementRep:
 	ld a, (INPUT_CUR_REP_COUNT)
 	inc a
 	cp INPUT_REP_COUNT
-	jr z, _IncrementInputRepeat_Threshold
+	jr z, _Input_IncrementRep_Over
 	ret
-_IncrementInputRepeat_Threshold:
+_Input_IncrementRep_Over:
 	ld a, 0
 	ld (INPUT_CUR_REP_COUNT), a
 	ret

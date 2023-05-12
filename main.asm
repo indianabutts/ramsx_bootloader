@@ -40,16 +40,6 @@ Init:
 	call CopyWorkBufferToVRAM
 	call MainLoop
 
-
-
-CheckBiosInput:
-	call CHGET
-	cp UP_CODE
-	call z, Cursor_DecrementIndex
-	cp DOWN_CODE
-	call z, Cursor_DecrementIndex
-	ret
-
 MainLoop:
 	di
 	call Input_UpdateInputBuffers

@@ -1,4 +1,4 @@
-	include "CURSOR_CONSTANTS.asm"
+	include "cursor/CURSOR_CONSTANTS.asm"
 
 Cursor_CheckInput:
 	ld hl,(INPUT_NAV_STATE)

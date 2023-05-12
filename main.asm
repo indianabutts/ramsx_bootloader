@@ -1,27 +1,27 @@
 				; ==[ Constants ]============================================
 
 
-	include "SYS_BIOSCALLS.asm"
-	include "SYS_VARIABLES.asm"
-	include "CHAR_CODES.asm"
-	include "CURSOR_VARIABLES.asm"
-	include "VRAM_VARIABLES.asm"
-	include "INPUT_VARIABLES.asm"
+	include "sys/SYS_BIOSCALLS.asm"
+	include "sys/SYS_VARIABLES.asm"
+	include "utils/CHAR_CODES.asm"
+	include "cursor/CURSOR_VARIABLES.asm"
+	include "vram/VRAM_VARIABLES.asm"
+	include "input/INPUT_VARIABLES.asm"
 	include "MAIN_CONSTANTS.asm"
-	include "COMMAND_CONSTANTS.asm"
-	include "INPUT_CONSTANTS.asm"
+	include "command/COMMAND_CONSTANTS.asm"
+	include "input/INPUT_CONSTANTS.asm"
 
-	include "CART_HEADER.asm"
+	include "utils/CART_HEADER.asm"
 
-	include "VRAM_BUFFER.asm"
+	include "vram/VRAM_BUFFER.asm"
 	
 TOTAL_PAGES:
 	dw 30
 
-	include "CURSOR_FUNCTIONS.asm"
-	include "VRAM_FUNCTIONS.asm"
-	include "MATH_FUNCTIONS.asm"
-	include "INPUT_FUNCTIONS.asm"
+	include "cursor/CURSOR_FUNCTIONS.asm"
+	include "vram/VRAM_FUNCTIONS.asm"
+	include "utils/MATH_FUNCTIONS.asm"
+	include "input/INPUT_FUNCTIONS.asm"
 				; ==[ Program ]=============================================
 Init:
 	;; Set Screen Mode to 0

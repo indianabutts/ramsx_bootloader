@@ -6,6 +6,8 @@ CHMOD   equ $005f
 CHGET equ $009F
 CHCOLOR equ $0062
 
+
+SCREEN_MEM equ $1800
 FORCLR equ $F3E9
 BAKCLR equ $F3EA
 BDCLR equ $F3EB
@@ -70,7 +72,8 @@ Init:
 	ld a, 1
 	ld (BAKCLR), a
 	ld (BDCLR), a
-	call CHCOLOR
+	call CHCOLOR	
+	
 	
 InitGameLoop:
 ; Dummy Dir Name and Go Back to determine maximum games in list
@@ -87,7 +90,7 @@ InitGameLoop:
 	; ld (currentGame), hl
 	; Load end address for Games List
 	ld de, gamesend
-	
+
 	; Initialize Loop Index to 0
 	ld a, 0 
 	ld (loopIndex), a
@@ -171,20 +174,22 @@ NewLn:
 	ret
 
 IncrementSelector:
+	;; Will need to blank the current selector on the screen before updating the value
 	ld hl, (selectorIndex)
 	inc hl
 	ld a, l
 	cp $15
-	call z, ClampSelector
+	call z, ZeroSelector
 	ld (selectorIndex), hl
 	ret
 
 DecrementSelector:
+	;; Will need to Blank the Current Selector On the screen before updating the value
 	ld hl, (selectorIndex)
 	dec hl
 	ld a, l
 	cp $FF
-	call z, ZeroSelector
+	call z, ClampSelector
 	ld (selectorIndex), hl
 	ret
 

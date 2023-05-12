@@ -22,6 +22,7 @@ TOTAL_PAGES:
 	include "vram/VRAM_FUNCTIONS.asm"
 	include "utils/MATH_FUNCTIONS.asm"
 	include "input/INPUT_FUNCTIONS.asm"
+	include "command/COMMAND_FUNCTIONS.asm"
 				; ==[ Program ]=============================================
 Init:
 	;; Set Screen Mode to 0
@@ -44,5 +45,6 @@ MainLoop:
 	di
 	call Input_UpdateInputBuffers
 	call Cursor_CheckInput
+	call Command_CheckInput
 	jr MainLoop
 		

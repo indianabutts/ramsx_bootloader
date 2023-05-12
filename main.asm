@@ -10,6 +10,9 @@ ORGADR  equ $4000
 	
 	include "CART_HEADER.asm"
 	include "VRAM_BUFFER.asm"
+	
+TOTAL_PAGES:
+	dw 30
 				; ==[ Program ]=============================================
 Init:
 	;; Set Screen Mode to 0
@@ -19,8 +22,8 @@ Init:
 	ld (BAKCLR), a
 	ld (BDCLR), a
 	ld a, 0
-	ld (CUR_SEL_INDEX),a
-	ld (OLD_SEL_INDEX),a
+	ld (CUR_INDEX),a
+	ld (OLD_CUR_INDEX),a
 	call CHGCLR
 	;; Copy the VRAM_BUFFER to RAM so that we can update it
 	call CopyBufferToRam
@@ -44,28 +47,28 @@ CopyBufferToRam:
 	
 IncrementSelector:
 	;; Will need to blank the current selector on the screen before updating the values
-	ld hl, (CUR_SEL_INDEX)
+	ld hl, (CUR_INDEX)
 	ld a, l
-	ld (OLD_SEL_INDEX),a
+	ld (OLD_CUR_INDEX),a
 	inc hl
 	ld a, l
 	cp $15
 	call z, ZeroSelector
-	ld (CUR_SEL_INDEX), a
+	ld (CUR_INDEX), a
 	call UpdateCursor
 	call CopyWorkBufferToVRAM
 	ret
 
 DecrementSelector:
 	;; Will need to Blank the Current Selector On the screen before updating the value
-	ld hl, (CUR_SEL_INDEX)
+	ld hl, (CUR_INDEX)
 	ld a, l
-	ld (OLD_SEL_INDEX),a
+	ld (OLD_CUR_INDEX),a
 	dec hl
 	ld a, l
 	cp $FF
 	call z, ClampSelector
-	ld (CUR_SEL_INDEX), a
+	ld (CUR_INDEX), a
 	call UpdateCursor
 	call CopyWorkBufferToVRAM
 	ret
@@ -74,7 +77,7 @@ UpdateCursor:
 	;; First we Add the new cursor to the Buffer
 	;; We load the CUR_SEL into de, and multiply it by 40
 	;; to get the row we are on
-	ld a, (CUR_SEL_INDEX)
+	ld a, (CUR_INDEX)
 	ld h, a
 	ld e, 40
 	call Mult8x8
@@ -87,7 +90,7 @@ UpdateCursor:
 	;; We then Write the character to the location in RAM
 	ld (hl), $CF
 	;; We repeat for Clearing the OLD_SEL_INDEX
-	ld a, (OLD_SEL_INDEX)
+	ld a, (OLD_CUR_INDEX)
 	ld h, a
 	ld e, 40
 	call Mult8x8

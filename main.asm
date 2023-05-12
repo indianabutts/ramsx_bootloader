@@ -174,12 +174,12 @@ NewLn:
 	ret
 
 IncrementSelector:
-	;; Will need to blank the current selector on the screen before updating the value
+	;; Will need to blank the current selector on the screen before updating the values
 	ld hl, (selectorIndex)
 	inc hl
 	ld a, l
 	cp $15
-	call z, ZeroSelector
+	call z, ZerosSelector
 	ld (selectorIndex), hl
 	ret
 

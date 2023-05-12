@@ -1,353 +1,484 @@
 Sections:
-00: "seg4000" (4000-4331)
+00: "seg4000" (4000-4486)
 
 
 Source: "./main.asm"
                         	     1: 				; ==[ Constants ]============================================
                         	     2: 
-                        	     3: ORGADR  equ $4000
-                        	     4: CHPUT   equ $00A2
-                        	     5: CHMOD   equ $005f
-                        	     6: CHGET equ $009F
-                        	     7: CHCOLOR equ $0062
-                        	     8: 
-                        	     9: FORCLR equ $F3E9
-                        	    10: BAKCLR equ $F3EA
-                        	    11: BDCLR equ $F3EB
-                        	    12: 
-                        	    13: CLS equ $00C3
+                        	     3: 
+                        	     4: 	include "SYS_BIOSCALLS.asm"
+
+Source: "SYS_BIOSCALLS.asm"
+                        	     1: ;;; MSX BIOS Calls
+                        	     2: ;;; Information from : http://map.grauw.nl/resources/msxbios.php
+                        	     3: 
+                        	     4: 
+                        	     5: ;;; ====================================================
+                        	     6: ;;; Block Transfer to VRAM from memory
+                        	     7: ;;; Inputs:
+                        	     8: ;;;       BC - Block Length
+                        	     9: ;;;       DE - Start of VRAM
+                        	    10: ;;;       HL - Start address of memory
+                        	    11: ;;;       Registers: All
+                        	    12: ;;; ====================================================
+                        	    13: LDIRVM: equ $005C
                         	    14: 
-                        	    15: KBDROW equ $AA
-                        	    16: KBDDATA equ $A9
-                        	    17: KEYS	EQU	$FBE5
-                        	    18: 
-                        	    19: selectorIndex equ $C001
-                        	    20: currentGame equ $C003
-                        	    21: loopIndex equ $C005
-                        	    22: currentPage equ $C006
-                        	    23: 
-                        	    24: 				; ==[ Header ]==============================================
-                        	    25: 
-                        	    26: 				; Place header inside the binary.
-                        	    27: 	org ORGADR
-                        	    28: 				; ROM header
-00:4000 4142            	    29: 	db "AB"
-00:4002 7242            	    30: 	dw Init
-00:4004 0000            	    31: 	dw 0, 0, 0, 0, 0, 0
+                        	    15: ;;; ====================================================
+                        	    16: ;;; Changes the screen colors
+                        	    17: ;;; Inputs:
+                        	    18: ;;;       Foreground Color in FORCLR
+                        	    19: ;;;       Background Color in BAKCLR
+                        	    20: ;;;       Border Color in BDRCLR
+                        	    21: ;;;       Registers: All
+                        	    22: ;;; ====================================================
+                        	    23: CHGCLR:	equ $0062
+                        	    24: 
+                        	    25: ;;; ====================================================
+                        	    26: ;;; Clears the screen
+                        	    27: ;;; Inputs:
+                        	    28: ;;;       Foreground Color in FORCLR
+                        	    29: ;;;       Background Color in BAKCLR
+                        	    30: ;;;       Border Color in BDRCLR
+                        	    31: ;;;       Registers: All
+                        	    32: ;;; ====================================================
+                        	    33: CLS:	equ $00C3
+                        	    34: 
+                        	    35: ;;; ====================================================
+                        	    36: ;;; Switches to SCREEN 0 (text screen with 40×24 characters)Clears the screen
+                        	    37: ;;; Inputs:
+                        	    38: ;;;       TXTNAM
+                        	    39: ;;;       TXTCGP
+                        	    40: ;;;       Registers: All
+                        	    41: ;;; ====================================================
+                        	    42: INITXT:	equ #006C
+                        	    43: 
+                        	    44: ;;; ====================================================
+                        	    45: ;;; One character input (waiting)
+                        	    46: ;;; Output:
+                        	    47: ;;;       A - ASCII Code of the input character
+                        	    48: ;;;       Registers: AF
+                        	    49: ;;; ====================================================	
+                        	    50: CHGET equ $009F
+                        	    51: 
+
+Source: "./main.asm"
+                        	     5: 	include "SYS_VARIABLES.asm"
+
+Source: "SYS_VARIABLES.asm"
+                        	     1: ;;; MSX System Variables
+                        	     2: ;;; Information from : https://map.grauw.nl/resources/msxsystemvars.php
+                        	     3: 	
+                        	     4: FORCLR:	equ $F3E9		; Foreground Color - 1 byte
+                        	     5: 
+                        	     6: BAKCLR:	equ $F3EA		; Background Color - 1 byte
+                        	     7: 
+                        	     8: BDCLR:	equ $F3EB 		; Border Color - 1 byte
+                        	     9: 
+                        	    10: TXTNAM:	equ $F3B3
+                        	    11: 
+
+Source: "./main.asm"
+                        	     6: 	include "CHAR_CODES.asm"
+
+Source: "CHAR_CODES.asm"
+                        	     1: ;;; Character codes for both input and output
+                        	     2: 	
+                        	     3: UP_CODE:	equ $1E
+                        	     4: DOWN_CODE:	equ $1F
+                        	     5: SPACE_CODE:	equ $20
+                        	     6: POINTER_CODE:	equ $CF
+                        	     7: 
+                        	     8: 
+
+Source: "./main.asm"
+                        	     7: 	include "WORKING_VARIABLES.asm"
+
+Source: "WORKING_VARIABLES.asm"
+                        	     1: CUR_SEL_INDEX:	equ $C001	; Current index of the Cursor
+                        	     2: OLD_SEL_INDEX:	equ $C002	; The last index of the Cursor
+                        	     3: CUR_GAME:	equ $C003	; The game that was selected
+                        	     4: CUR_PAGE:	equ $C004	; The page number
+                        	     5: VRM_WRK_AREA:	equ $C100
+                        	     6: 
+
+Source: "./main.asm"
+                        	     8: 	
+                        	     9: ORGADR  equ $4000
+                        	    10: 	
+                        	    11: 	include "CART_HEADER.asm"
+
+Source: "CART_HEADER.asm"
+                        	     1: ;;; Header for the Cartridge to be recognised by the MSX
+                        	     2: 	
+                        	     3: 	org ORGADR
+                        	     4: 				
+00:4000 4142            	     5: 	db "AB"
+00:4002 D143            	     6: 	dw Init
+00:4004 0000            	     7: 	dw 0, 0, 0, 0, 0, 0
 00:4006 0000
 00:4008 0000
 00:400A 0000
 00:400C 0000
 00:400E 0000
-                        	    32: 
-                        	    33: 
-                        	    34: games:
-00:4010 3130205961726420	    35: 	db "10 Yard Fight (1986)   128kb", 0
-00:4018 4669676874202831
-00:4020 3938362920202031
-00:4028 32386B62
-00:402C 00
-00:402D 3139343220283139	    36: 	db "1942 (1986)(ASCII)(J   128kb", 0
-00:4035 3836292841534349
-00:403D 4929284A20202031
-00:4045 32386B62
-00:4049 00
-00:404A 3139343220283139	    37: 	db "1942 (1987)(Zemina)(   128kb", 0
-00:4052 383729285A656D69
-00:405A 6E61292820202031
-00:4062 32386B62
-00:4066 00
-00:4067 334420476F6C6620	    38: 	db "3D Golf Simulation -   128kb", 0
-00:406F 53696D756C617469
-00:4077 6F6E202D20202031
-00:407F 32386B62
-00:4083 00
-00:4084 334420476F6C6620	    39: 	db "3D Golf Simulation -   128kb", 0
-00:408C 53696D756C617469
-00:4094 6F6E202D20202031
-00:409C 32386B62
-00:40A0 00
-00:40A1 33442054656E6E69	    40: 	db "3D Tennis (1983)(ASC   128kb", 0
-00:40A9 7320283139383329
-00:40B1 2841534320202031
-00:40B9 32386B62
-00:40BD 00
-00:40BE 3344205761746572	    41: 	db "3D Water Driver (198   128kb", 0
-00:40C6 2044726976657220
-00:40CE 2831393820202031
-00:40D6 32386B62
-00:40DA 00
-00:40DB 41204C696665204D	    42: 	db "A Life M36 Planet -    128kb", 0
-00:40E3 333620506C616E65
-00:40EB 74202D2020202031
-00:40F3 32386B62
-00:40F7 00
-00:40F8 412E452E20283139	    43: 	db "A.E. (1983)(Toshiba-   128kb", 0
-00:4100 38332928546F7368
-00:4108 6962612D20202031
-00:4110 32386B62
-00:4114 00
-00:4115 4131205370697269	    44: 	db "A1 Spirit - The Way    128kb", 0
-00:411D 74202D2054686520
-00:4125 5761792020202031
-00:412D 32386B62
-00:4131 00
-00:4132 4163746D616E2028	    45: 	db "Actman (1984)(ASCII)   128kb", 0
-00:413A 3139383429284153
-00:4142 4349492920202031
-00:414A 32386B62
-00:414E 00
-00:414F 416476656E276368	    46: 	db "Adven'chuta! (1983)(   128kb", 0
-00:4157 7574612120283139
-00:415F 3833292820202031
-00:4167 32386B62
-00:416B 00
-00:416C 416C63617A617220	    47: 	db "Alcazar - The Forgot   128kb", 0
-00:4174 2D2054686520466F
-00:417C 72676F7420202031
-00:4184 32386B62
-00:4188 00
-00:4189 416C696261626120	    48: 	db "Alibaba and 40 Thiev   128kb", 0
-00:4191 616E642034302054
-00:4199 6869657620202031
-00:41A1 32386B62
-00:41A5 00
-00:41A6 416C69656E203820	    49: 	db "Alien 8 (1985)(Ultim   128kb", 0
-00:41AE 2831393835292855
-00:41B6 6C74696D20202031
-00:41BE 32386B62
-00:41C2 00
-00:41C3 416C69656E203820	    50: 	db "Alien 8 (1986)(Nippo   128kb", 0
-00:41CB 283139383629284E
-00:41D3 6970706F20202031
-00:41DB 32386B62
-00:41DF 00
-00:41E0 416C69656E732E20	    51: 	db "Aliens. Alien 2 (198   128kb", 0
-00:41E8 416C69656E203220
-00:41F0 2831393820202031
-00:41F8 32386B62
-00:41FC 00
-00:41FD 416C70686120526F	    52: 	db "Alpha Roid (1986)(Po   128kb", 0
-00:4205 6964202831393836
-00:420D 2928506F20202031
-00:4215 32386B62
-00:4219 00
-00:421A 416C706861205371	    53: 	db "Alpha Squadron (1985   128kb", 0
-00:4222 756164726F6E2028
-00:422A 3139383520202031
-00:4232 32386B62
-00:4236 00
-00:4237 416D65726963616E	    54: 	db "American Truck (1986   128kb", 0
-00:423F 20547275636B2028
-00:4247 3139383620202031
-00:424F 32386B62
-00:4253 00
-00:4254 416D65726963616E	    55: 	db "American Truck (1986   128kb", 0
-00:425C 20547275636B2028
-00:4264 3139383620202031
-00:426C 32386B62
-00:4270 00
-                        	    56: gamesend:
-00:4271 00              	    57: 	nop
-                        	    58: 				; ==[ Program ]=============================================
-                        	    59: Init:
-00:4272 210800          	    60: 	ld hl, 8
-00:4275 22AA00          	    61: 	ld (KBDROW), hl
-                        	    62: 	; Set Screen Mode to 0
-00:4278 3E00            	    63: 	ld a, 0
-00:427A CD5F00          	    64: 	call CHMOD
-                        	    65: 	; Set Pallette to White on Black
-00:427D 3E01            	    66: 	ld a, 1
-00:427F 32EAF3          	    67: 	ld (BAKCLR), a
-00:4282 32EBF3          	    68: 	ld (BDCLR), a
-00:4285 CD6200          	    69: 	call CHCOLOR
-                        	    70: 	
-                        	    71: InitGameLoop:
-                        	    72: ; Dummy Dir Name and Go Back to determine maximum games in list
-00:4288 CDC300          	    73: 	call CLS
-00:428B 212843          	    74: 	ld hl, dirName
-00:428E CDD742          	    75: 	call PrintStr
-00:4291 CDF242          	    76: 	call NewLn
-00:4294 212443          	    77: 	ld hl, goBack
-00:4297 CDD742          	    78: 	call PrintStr
-00:429A CDF242          	    79: 	call NewLn
-                        	    80: 	; Load start address for Games List
-00:429D 211040          	    81: 	ld hl,games
-                        	    82: 	; ld (currentGame), hl
-                        	    83: 	; Load end address for Games List
-00:42A0 117142          	    84: 	ld de, gamesend
-                        	    85: 	
-                        	    86: 	; Initialize Loop Index to 0
-00:42A3 3E00            	    87: 	ld a, 0 
-00:42A5 3205C0          	    88: 	ld (loopIndex), a
-                        	    89: 
-                        	    90: GamesLoop:
-                        	    91: 	; Put Pointer Character if LoopIndex is Equ to PointerIndex
-                        	    92: 	
-                        	    93: 	;; Store the current HL
-00:42A8 E5              	    94: 	push hl
-                        	    95: 
-00:42A9 3E00            	    96: 	ld a, 0
-00:42AB B7              	    97: 	or a,
-00:42AC D601            	    98: 	sub 1
-                        	    99: 	;; Get the Pointer Index
-00:42AE 2101C0          	   100: 	ld hl, selectorIndex
-00:42B1 4E              	   101: 	ld c, (hl)
-                        	   102: 	;; Get the LoopIndex	
-00:42B2 2A05C0          	   103: 	ld hl, (loopIndex)
-00:42B5 7D              	   104: 	ld a, l
-00:42B6 B9              	   105: 	cp c
-00:42B7 CCE142          	   106: 	call z, PrintPointer
-00:42BA C4EA42          	   107: 	call nz, PrintSpace
-00:42BD 23              	   108: 	inc hl
-00:42BE 2205C0          	   109: 	ld (loopIndex), hl
-00:42C1 E1              	   110: 	pop hl
-                        	   111: 	
-                        	   112: 	
-                        	   113: 	;; Compare the two, if equal, then print the pointer, else continue
-                        	   114: 
-                        	   115: 	;; Restore HL
-                        	   116: 
-                        	   117: 	
-                        	   118: 	; Print Current Game Name and a new line
-00:42C2 CDD742          	   119: 	call PrintStr
-00:42C5 CDF242          	   120: 	call NewLn
-                        	   121: 	
-                        	   122: 	; Compare HL to GamesEnd
-00:42C8 3E00            	   123: 	ld a, 0
-00:42CA B7              	   124: 	or a	; Clears Carry Flag
-00:42CB 23              	   125: 	inc hl
-00:42CC 117142          	   126: 	ld de, gamesend
-00:42CF ED52            	   127: 	sbc hl,de
-00:42D1 19              	   128: 	add hl,de
-                        	   129: 	
-                        	   130: 	; Loop if HL is less than GamesEnd
-00:42D2 38D4            	   131: 	jr c, GamesLoop
-00:42D4 C31D43          	   132: 	jp MainLoop
-                        	   133: 
-                        	   134: PrintStr:
-                        	   135: 	; Load first character of string to Reg A
-00:42D7 7E              	   136: 	ld a, (hl)
-                        	   137: 	; If 0 detected, this is the end of the string
-00:42D8 FE00            	   138: 	cp 0
-00:42DA C8              	   139: 	ret z
-                        	   140: 	; Otherwise, Increment HL and Put the current value pointed to by HL to the screen and loop
-00:42DB 23              	   141: 	inc hl
-00:42DC CDA200          	   142: 	call CHPUT
-00:42DF 18F6            	   143: 	jr PrintStr
-                        	   144: 
-                        	   145: PrintPointer:
-00:42E1 F5              	   146: 	push af
-00:42E2 3A3043          	   147: 	ld a, (pointerChar)
-00:42E5 CDA200          	   148: 	call CHPUT
-00:42E8 F1              	   149: 	pop af
-00:42E9 C9              	   150: 	ret
-                        	   151: 	
-                        	   152: PrintSpace:
-00:42EA F5              	   153: 	push af,
-00:42EB 3E20            	   154: 	ld a, $20
-00:42ED CDA200          	   155: 	call CHPUT
-00:42F0 F1              	   156: 	pop af,
-00:42F1 C9              	   157: 	ret
-                        	   158: 
-                        	   159: NewLn:
-00:42F2 F5              	   160: 	push af
-00:42F3 3E0D            	   161: 	ld a, 13
-00:42F5 CDA200          	   162: 	call CHPUT
-00:42F8 3E0A            	   163: 	ld a, 10
-00:42FA CDA200          	   164: 	call CHPUT
-00:42FD F1              	   165: 	pop af
-00:42FE C9              	   166: 	ret
-                        	   167: 
-                        	   168: IncrementSelector:
-00:42FF 2A01C0          	   169: 	ld hl, (selectorIndex)
-00:4302 23              	   170: 	inc hl
-00:4303 2201C0          	   171: 	ld (selectorIndex), hl
-00:4306 C9              	   172: 	ret
-                        	   173: 
-                        	   174: DecrementSelector:
-00:4307 2A01C0          	   175: 	ld hl, (selectorIndex)
-00:430A 2B              	   176: 	dec hl
-00:430B 2201C0          	   177: 	ld (selectorIndex), hl
-00:430E C9              	   178: 	ret
-                        	   179: 
-                        	   180: CheckInput:
-00:430F CD9F00          	   181: 	call CHGET
-00:4312 FE1E            	   182: 	cp 30
-00:4314 CC0743          	   183: 	call z, DecrementSelector
-00:4317 FE1F            	   184: 	cp 31
-00:4319 CCFF42          	   185: 	call z, IncrementSelector
-00:431C C9              	   186: 	ret
-                        	   187: 
-                        	   188: MainLoop:
-00:431D F3              	   189: 	di
-00:431E CD0F43          	   190: 	call CheckInput
-00:4321 CD8842          	   191: 	call InitGameLoop
-                        	   192: 	
-                        	   193: 	
-                        	   194: 
-00:4324 202E2E          	   195: goBack:	 db " ..",0
-00:4327 00
-00:4328 2047616D65732F  	   196: dirName: db " Games/",0
-00:432F 00
-                        	   197: pointerChar:
-00:4330 3E              	   198: 	db ">"
+                        	     8: 
+
+Source: "./main.asm"
+                        	    12: 	include "VRAM_BUFFER.asm"
+
+Source: "VRAM_BUFFER.asm"
+                        	     1: VRAM_BUFFER:
+00:4010 C6              	     2: 	db $c6,"  File                 ",$c6,"   Size    V0.1"
+00:4011 202046696C652020
+00:4019 2020202020202020
+00:4021 20202020202020
+00:4028 C6
+00:4029 20202053697A6520
+00:4031 20202056302E31
+00:4038 C3              	     3: 	db $c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3,$c3
+00:4039 C3
+00:403A C3
+00:403B C3
+00:403C C3
+00:403D C3
+00:403E C3
+00:403F C3
+00:4040 C3
+00:4041 C3
+00:4042 C3
+00:4043 C3
+00:4044 C3
+00:4045 C3
+00:4046 C3
+00:4047 C3
+00:4048 C3
+00:4049 C3
+00:404A C3
+00:404B C3
+00:404C C3
+00:404D C3
+00:404E C3
+00:404F C3
+00:4050 C3
+00:4051 C3
+00:4052 C3
+00:4053 C3
+00:4054 C3
+00:4055 C3
+00:4056 C3
+00:4057 C3
+00:4058 C3
+00:4059 C3
+00:405A C3
+00:405B 00
+00:405C 00
+00:405D 00
+00:405E 00
+00:405F 00
+00:4060 CF              	     4: 	db $CF,"10 Yard Fight (1986)   ",$c6,"   8kb         "
+00:4061 3130205961726420
+00:4069 4669676874202831
+00:4071 39383629202020
+00:4078 C6
+00:4079 202020386B622020
+00:4081 20202020202020
+00:4088 2031302059617264	     5: 	db " 10 Yard Fight (1986)   ",$c6,"   8kb         "
+00:4090 2046696768742028
+00:4098 3139383629202020
+00:40A0 C6
+00:40A1 202020386B622020
+00:40A9 20202020202020
+00:40B0 2031302059617264	     6: 	db " 10 Yard Fight (1986)   ",$c6,"   8kb         "
+00:40B8 2046696768742028
+00:40C0 3139383629202020
+00:40C8 C6
+00:40C9 202020386B622020
+00:40D1 20202020202020
+00:40D8 2031302059617264	     7: 	db " 10 Yard Fight (1986)   ",$c6,"   8kb         "
+00:40E0 2046696768742028
+00:40E8 3139383629202020
+00:40F0 C6
+00:40F1 202020386B622020
+00:40F9 20202020202020
+00:4100 2031302059617264	     8: 	db " 10 Yard Fight (1986)   ",$c6,"   8kb         "
+00:4108 2046696768742028
+00:4110 3139383629202020
+00:4118 C6
+00:4119 202020386B622020
+00:4121 20202020202020
+00:4128 2031302059617264	     9: 	db " 10 Yard Fight (1986)   ",$c6,"   8kb         "
+00:4130 2046696768742028
+00:4138 3139383629202020
+00:4140 C6
+00:4141 202020386B622020
+00:4149 20202020202020
+00:4150 2031302059617264	    10: 	db " 10 Yard Fight (1986)   ",$c6,"   8kb         "
+00:4158 2046696768742028
+00:4160 3139383629202020
+00:4168 C6
+00:4169 202020386B622020
+00:4171 20202020202020
+00:4178 2031393432202831	    11: 	db " 1942 (1986)(ASCII)(J   ",$c6,"   8kb         "
+00:4180 3938362928415343
+00:4188 494929284A202020
+00:4190 C6
+00:4191 202020386B622020
+00:4199 20202020202020
+00:41A0 2031393432202831	    12: 	db " 1942 (1987)(Zemina)(   ",$c6,"   8kb         "
+00:41A8 39383729285A656D
+00:41B0 696E612928202020
+00:41B8 C6
+00:41B9 202020386B622020
+00:41C1 20202020202020
+00:41C8 20334420476F6C66	    13: 	db " 3D Golf Simulation -   ",$c6,"  16kb         "
+00:41D0 2053696D756C6174
+00:41D8 696F6E202D202020
+00:41E0 C6
+00:41E1 202031366B622020
+00:41E9 20202020202020
+00:41F0 20334420476F6C66	    14: 	db " 3D Golf Simulation -   ",$c6,"  32kb         "
+00:41F8 2053696D756C6174
+00:4200 696F6E202D202020
+00:4208 C6
+00:4209 202033326B622020
+00:4211 20202020202020
+00:4218 2033442054656E6E	    15: 	db " 3D Tennis (1983)(ASC   ",$c6,"  32kb         "
+00:4220 6973202831393833
+00:4228 2928415343202020
+00:4230 C6
+00:4231 202033326B622020
+00:4239 20202020202020
+00:4240 2033442057617465	    16: 	db " 3D Water Driver (198   ",$c6,"  64kb         "
+00:4248 7220447269766572
+00:4250 2028313938202020
+00:4258 C6
+00:4259 202036346B622020
+00:4261 20202020202020
+00:4268 2041204C69666520	    17: 	db " A Life M36 Planet -    ",$c6,"  64kb         "
+00:4270 4D333620506C616E
+00:4278 6574202D20202020
+00:4280 C6
+00:4281 202036346B622020
+00:4289 20202020202020
+00:4290 20412E452E202831	    18: 	db " A.E. (1983)(Toshiba-   ",$c6,"  64kb         "
+00:4298 3938332928546F73
+00:42A0 686962612D202020
+00:42A8 C6
+00:42A9 202036346B622020
+00:42B1 20202020202020
+00:42B8 2041312053706972	    19: 	db " A1 Spirit - The Way    ",$c6," 128kb         "
+00:42C0 6974202D20546865
+00:42C8 2057617920202020
+00:42D0 C6
+00:42D1 203132386B622020
+00:42D9 20202020202020
+00:42E0 204163746D616E20	    20: 	db " Actman (1984)(ASCII)   ",$c6," 128kb         "
+00:42E8 2831393834292841
+00:42F0 5343494929202020
+00:42F8 C6
+00:42F9 203132386B622020
+00:4301 20202020202020
+00:4308 20416476656E2763	    21: 	db " Adven'chuta! (1983)(   ",$c6," 128kb         "
+00:4310 6875746121202831
+00:4318 3938332928202020
+00:4320 C6
+00:4321 203132386B622020
+00:4329 20202020202020
+00:4330 20416C63617A6172	    22: 	db " Alcazar - The Forgot   ",$c6," 128kb         "
+00:4338 202D205468652046
+00:4340 6F72676F74202020
+00:4348 C6
+00:4349 203132386B622020
+00:4351 20202020202020
+00:4358 20416C6962616261	    23: 	db " Alibaba and 40 Thiev   ",$c6," 256kb         "
+00:4360 20616E6420343020
+00:4368 5468696576202020
+00:4370 C6
+00:4371 203235366B622020
+00:4379 20202020202020
+00:4380 20416C69656E2038	    24: 	db " Alien 8 (1985)(Ultim   ",$c6," 256kb         "
+00:4388 2028313938352928
+00:4390 556C74696D202020
+00:4398 C6
+00:4399 203235366B622020
+00:43A1 20202020202020
+00:43A8 2020202020202020	    25: 	db "                         Page 1/300     "
+00:43B0 2020202020202020
+00:43B8 2020202020202020
+00:43C0 205061676520312F
+00:43C8 3330302020202020
+                        	    26: VRAM_BUFFER_END:
+00:43D0 00              	    27: 	nop
+                        	    28: 
+
+Source: "./main.asm"
+                        	    13: 				; ==[ Program ]=============================================
+                        	    14: Init:
+                        	    15: 	;; Set Screen Mode to 0
+00:43D1 CD6C00          	    16: 	call INITXT
+                        	    17: 	;; Set Pallette to White on Black
+00:43D4 3E01            	    18: 	ld a, 1
+00:43D6 32EAF3          	    19: 	ld (BAKCLR), a
+00:43D9 32EBF3          	    20: 	ld (BDCLR), a
+00:43DC CD6200          	    21: 	call CHGCLR
+                        	    22: 	;; Copy the VRAM_BUFFER to RAM so that we can update it
+00:43DF CDF643          	    23: 	call CopyBufferToRam
+                        	    24: 	;; Copy the VRAM_BUFFER in RAM to VRAM
+00:43E2 CDE843          	    25: 	call CopyWorkBufferToVRAM
+00:43E5 CD8044          	    26: 	call MainLoop
+                        	    27: 
+                        	    28: CopyWorkBufferToVRAM:
+00:43E8 01C003          	    29: 	ld bc, 960
+00:43EB ED5BB3F3        	    30: 	ld de, (TXTNAM)
+00:43EF 2100C1          	    31: 	ld hl, VRM_WRK_AREA
+00:43F2 CD5C00          	    32: 	call LDIRVM
+00:43F5 C9              	    33: 	ret
+                        	    34: 	
+                        	    35: CopyBufferToRam:
+00:43F6 211040          	    36: 	ld hl, VRAM_BUFFER
+00:43F9 1100C1          	    37: 	ld de, VRM_WRK_AREA
+00:43FC 01C003          	    38: 	ld bc, 960
+00:43FF EDB0            	    39: 	ldir
+00:4401 C9              	    40: 	ret
+                        	    41: 	
+                        	    42: IncrementSelector:
+                        	    43: 	;; Will need to blank the current selector on the screen before updating the values
+00:4402 2A01C0          	    44: 	ld hl, (CUR_SEL_INDEX)
+00:4405 7D              	    45: 	ld a, l
+00:4406 3202C0          	    46: 	ld (OLD_SEL_INDEX),a
+00:4409 23              	    47: 	inc hl
+00:440A 7D              	    48: 	ld a, l
+00:440B FE15            	    49: 	cp $15
+00:440D CC6D44          	    50: 	call z, ZeroSelector
+00:4410 3201C0          	    51: 	ld (CUR_SEL_INDEX), a
+00:4413 CD3244          	    52: 	call UpdateCursor
+00:4416 CDE843          	    53: 	call CopyWorkBufferToVRAM
+00:4419 C9              	    54: 	ret
+                        	    55: 
+                        	    56: DecrementSelector:
+                        	    57: 	;; Will need to Blank the Current Selector On the screen before updating the value
+00:441A 2A01C0          	    58: 	ld hl, (CUR_SEL_INDEX)
+00:441D 7D              	    59: 	ld a, l
+00:441E 3202C0          	    60: 	ld (OLD_SEL_INDEX),a
+00:4421 2B              	    61: 	dec hl
+00:4422 7D              	    62: 	ld a, l
+00:4423 FEFF            	    63: 	cp $FF
+00:4425 CC6F44          	    64: 	call z, ClampSelector
+00:4428 3201C0          	    65: 	ld (CUR_SEL_INDEX), a
+00:442B CD3244          	    66: 	call UpdateCursor
+00:442E CDE843          	    67: 	call CopyWorkBufferToVRAM
+00:4431 C9              	    68: 	ret
+                        	    69: 
+                        	    70: UpdateCursor:
+00:4432 ED5B01C0        	    71: 	ld de, (CUR_SEL_INDEX)
+00:4436 3E28            	    72: 	ld a, 40
+00:4438 CD5944          	    73: 	call Mult8x16
+00:443B 1100C1          	    74: 	ld de, VRM_WRK_AREA
+00:443E 19              	    75: 	add hl, de
+00:443F 115000          	    76: 	ld de, 80
+00:4442 19              	    77: 	add hl, de
+00:4443 36CF            	    78: 	ld (hl), $CF
+00:4445 ED5B02C0        	    79: 	ld de, (OLD_SEL_INDEX)
+00:4449 3E28            	    80: 	ld a, 40
+00:444B CD5944          	    81: 	call Mult8x16
+00:444E 1100C1          	    82: 	ld de, VRM_WRK_AREA
+00:4451 19              	    83: 	add hl, de
+00:4452 115000          	    84: 	ld de, 80
+00:4455 19              	    85: 	add hl, de
+00:4456 3620            	    86: 	ld (hl), $20
+00:4458 C9              	    87: 	ret
+                        	    88: ;;; Mult DE by A and store Result in AHL
+                        	    89: Mult8x16:
+00:4459 0E00            	    90: 	ld c, 0
+00:445B 61              	    91: 	ld h, c
+00:445C 6C              	    92: 	ld l, h
+00:445D 87              	    93: 	add a, a
+00:445E 3002            	    94: 	jr nc, $+4
+00:4460 62              	    95: 	ld h,d
+00:4461 6B              	    96: 	ld l,e
+00:4462 0607            	    97: 	ld b,7
+                        	    98: Mult_loop:
+00:4464 29              	    99: 	add hl, hl
+00:4465 17              	   100: 	rla
+00:4466 3002            	   101: 	jr nc, $+4
+00:4468 19              	   102: 	add hl, de
+00:4469 89              	   103: 	adc a, c
+00:446A 10F8            	   104: 	djnz Mult_loop
+00:446C C9              	   105: 	ret
+                        	   106: 	
+                        	   107: ZeroSelector:
+00:446D AF              	   108: 	xor a
+00:446E C9              	   109: 	ret
+                        	   110: 
+                        	   111: ClampSelector:
+00:446F 3E14            	   112: 	ld a, $14
+00:4471 C9              	   113: 	ret
+                        	   114: 	
+                        	   115: CheckInput:
+00:4472 CD9F00          	   116: 	call CHGET
+00:4475 FE1E            	   117: 	cp 30
+00:4477 CC1A44          	   118: 	call z, DecrementSelector
+00:447A FE1F            	   119: 	cp 31
+00:447C CC0244          	   120: 	call z, IncrementSelector
+00:447F C9              	   121: 	ret
+                        	   122: 
+                        	   123: MainLoop:
+00:4480 F3              	   124: 	di
+00:4481 CD7244          	   125: 	call CheckInput
+00:4484 18FA            	   126: 	jr MainLoop
+                        	   127: 		
+                        	   128: 
 
 
 Symbols by name:
 BAKCLR                           E:F3EA
 BDCLR                            E:F3EB
-CHCOLOR                          E:0062
-CheckInput                       A:430F
+CheckInput                       A:4472
+CHGCLR                           E:0062
 CHGET                            E:009F
-CHMOD                            E:005F
-CHPUT                            E:00A2
-CLS                              E:00C3
-DecrementSelector                A:4307
-dirName                          A:4328
-games                            A:4010
-gamesend                         A:4271
-GamesLoop                        A:42A8
-goBack                           A:4324
-IncrementSelector                A:42FF
-Init                             A:4272
-InitGameLoop                     A:4288
-KBDROW                           E:00AA
-loopIndex                        E:C005
-MainLoop                         A:431D
-NewLn                            A:42F2
+ClampSelector                    A:446F
+CopyBufferToRam                  A:43F6
+CopyWorkBufferToVRAM             A:43E8
+CUR_SEL_INDEX                    E:C001
+DecrementSelector                A:441A
+IncrementSelector                A:4402
+Init                             A:43D1
+INITXT                           E:006C
+LDIRVM                           E:005C
+MainLoop                         A:4480
+Mult8x16                         A:4459
+Mult_loop                        A:4464
+OLD_SEL_INDEX                    E:C002
 ORGADR                           E:4000
-pointerChar                      A:4330
-PrintPointer                     A:42E1
-PrintSpace                       A:42EA
-PrintStr                         A:42D7
-selectorIndex                    E:C001
+TXTNAM                           E:F3B3
+UpdateCursor                     A:4432
+VRAM_BUFFER                      A:4010
+VRAM_BUFFER_END                  A:43D0
+VRM_WRK_AREA                     E:C100
+ZeroSelector                     A:446D
 
 Symbols by value:
-005F CHMOD
-0062 CHCOLOR
+005C LDIRVM
+0062 CHGCLR
+006C INITXT
 009F CHGET
-00A2 CHPUT
-00AA KBDROW
-00C3 CLS
 4000 ORGADR
-4010 games
-4271 gamesend
-4272 Init
-4288 InitGameLoop
-42A8 GamesLoop
-42D7 PrintStr
-42E1 PrintPointer
-42EA PrintSpace
-42F2 NewLn
-42FF IncrementSelector
-4307 DecrementSelector
-430F CheckInput
-431D MainLoop
-4324 goBack
-4328 dirName
-4330 pointerChar
-C001 selectorIndex
-C005 loopIndex
+4010 VRAM_BUFFER
+43D0 VRAM_BUFFER_END
+43D1 Init
+43E8 CopyWorkBufferToVRAM
+43F6 CopyBufferToRam
+4402 IncrementSelector
+441A DecrementSelector
+4432 UpdateCursor
+4459 Mult8x16
+4464 Mult_loop
+446D ZeroSelector
+446F ClampSelector
+4472 CheckInput
+4480 MainLoop
+C001 CUR_SEL_INDEX
+C002 OLD_SEL_INDEX
+C100 VRM_WRK_AREA
+F3B3 TXTNAM
 F3EA BAKCLR
 F3EB BDCLR

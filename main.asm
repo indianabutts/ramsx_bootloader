@@ -40,16 +40,16 @@ Init:
 
 
 
-CheckInput:
+CheckBiosInput:
 	call CHGET
-	cp 30
+	cp UP_CODE
 	call z, DecrementCursor
-	cp 31
+	cp DOWN_CODE
 	call z, IncrementCursor
 	ret
 
 MainLoop:
 	di
-	call CheckInput
+	call CheckBiosInput
 	jr MainLoop
 		

@@ -82,13 +82,15 @@ Source: "./main.asm"
 
 Source: "CHAR_CODES.asm"
                         	     1: ;;; Character codes for both input and output
-                        	     2: 	
-                        	     3: UP_CODE:	equ $1E
-                        	     4: DOWN_CODE:	equ $1F
-                        	     5: SPACE_CODE:	equ $20
-                        	     6: POINTER_CODE:	equ $CF
-                        	     7: 
-                        	     8: 
+                        	     2: 
+                        	     3: RIGHT_CODE:	equ $1C
+                        	     4: LEFT_CODE:	equ $1D	
+                        	     5: UP_CODE:	equ $1E
+                        	     6: DOWN_CODE:	equ $1F
+                        	     7: SPACE_CODE:	equ $20
+                        	     8: POINTER_CODE:	equ $CF
+                        	     9: 
+                        	    10: 
 
 Source: "./main.asm"
                         	     7: 	include "CURSOR_VARIABLES.asm"
@@ -329,10 +331,10 @@ Source: "VRAM_BUFFER.asm"
 00:4398 C6
 00:4399 203235366B622020
 00:43A1 20202020202020
-00:43A8 2020202020202020	    25: 	db "                         Page 1/300     "
+00:43A8 2020202020202020	    25: 	db "                       Page   1/300     "
 00:43B0 2020202020202020
-00:43B8 2020202020202020
-00:43C0 205061676520312F
+00:43B8 2020202020202050
+00:43C0 616765202020312F
 00:43C8 3330302020202020
                         	    26: VRAM_BUFFER_END:
 00:43D0 00              	    27: 	nop
@@ -483,7 +485,7 @@ Source: "./main.asm"
                         	    22: 	include "INPUT_FUNCTIONS.asm"
 
 Source: "INPUT_FUNCTIONS.asm"
-                        	     1: CHECK_INPUT:
+                        	     1: CheckInput:	
 00:446D 00              	     2: 	nop
                         	     3: 
 
@@ -508,17 +510,17 @@ Source: "./main.asm"
                         	    40: 
                         	    41: 
                         	    42: 
-                        	    43: CheckInput:
+                        	    43: CheckBiosInput:
 00:448D CD9F00          	    44: 	call CHGET
-00:4490 FE1E            	    45: 	cp 30
+00:4490 FE1E            	    45: 	cp UP_CODE
 00:4492 CCEB43          	    46: 	call z, DecrementCursor
-00:4495 FE1F            	    47: 	cp 31
+00:4495 FE1F            	    47: 	cp DOWN_CODE
 00:4497 CCD343          	    48: 	call z, IncrementCursor
 00:449A C9              	    49: 	ret
                         	    50: 
                         	    51: MainLoop:
 00:449B F3              	    52: 	di
-00:449C CD8D44          	    53: 	call CheckInput
+00:449C CD8D44          	    53: 	call CheckBiosInput
 00:449F 18FA            	    54: 	jr MainLoop
                         	    55: 		
                         	    56: 
@@ -529,8 +531,8 @@ _Mult8x16_Loop                   A:4464
 _Mult8x8_Loop                    A:4452
 BAKCLR                           E:F3EA
 BDCLR                            E:F3EB
-CHECK_INPUT                      A:446D
-CheckInput                       A:448D
+CheckBiosInput                   A:448D
+CheckInput                       A:446D
 CHGCLR                           E:0062
 CHGET                            E:009F
 ClampCursor                      A:442C
@@ -540,6 +542,7 @@ CUR_INDEX                        E:C001
 CUR_ROW_LENGTH                   E:0028
 CUR_ROW_OFFSET                   E:0050
 DecrementCursor                  A:43EB
+DOWN_CODE                        E:001F
 IncrementCursor                  A:43D3
 Init                             A:446E
 INITXT                           E:006C
@@ -553,6 +556,7 @@ POINTER_CODE                     E:00CF
 SPACE_CODE                       E:0020
 TOTAL_PAGES                      A:43D1
 TXTNAM                           E:F3B3
+UP_CODE                          E:001E
 UpdateCursor                     A:4403
 VRAM_BUFFER                      A:4010
 VRAM_BUFFER_END                  A:43D0
@@ -560,6 +564,8 @@ VRM_WRK_AREA                     E:C100
 ZeroCursor                       A:442A
 
 Symbols by value:
+001E UP_CODE
+001F DOWN_CODE
 0020 SPACE_CODE
 0028 CUR_ROW_LENGTH
 0050 CUR_ROW_OFFSET
@@ -583,9 +589,9 @@ Symbols by value:
 4452 _Mult8x8_Loop
 4459 Mult8x16
 4464 _Mult8x16_Loop
-446D CHECK_INPUT
+446D CheckInput
 446E Init
-448D CheckInput
+448D CheckBiosInput
 449B MainLoop
 C001 CUR_INDEX
 C002 OLD_CUR_INDEX

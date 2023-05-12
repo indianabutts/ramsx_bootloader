@@ -1,2 +1,2 @@
-CHECK_INPUT:
+CheckInput:	
 	nop

@@ -22,6 +22,6 @@ VRAM_BUFFER:
 	db " Alcazar - The Forgot   ",$c6," 128kb         "
 	db " Alibaba and 40 Thiev   ",$c6," 256kb         "
 	db " Alien 8 (1985)(Ultim   ",$c6," 256kb         "
-	db "                         Page 1/300     "
+	db "                       Page   1/300     "
 VRAM_BUFFER_END:
 	nop

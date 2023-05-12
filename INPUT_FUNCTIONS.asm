@@ -1,0 +1,2 @@
+CHECK_INPUT:
+	nop

@@ -1,3 +1,5 @@
+	include "CURSOR_CONSTANTS.asm"
+	
 IncrementCursor:
 	ld hl, (CUR_INDEX)
 	ld a, l
@@ -30,24 +32,24 @@ UpdateCursor:
 	;; to get the row we are on
 	ld a, (CUR_INDEX)
 	ld h, a
-	ld e, 40
+	ld e, CUR_ROW_LENGTH
 	call Mult8x8
 	;; We then add the base address of the Buffer to the HL result
 	ld de, VRM_WRK_AREA
 	add hl, de
 	;; We finally add a standard offset of 80 to get it started on the right row
-	ld de, 80
+	ld de, CUR_ROW_OFFSET
 	add hl, de
 	;; We then Write the character to the location in RAM
 	ld (hl), POINTER_CODE
 	;; We repeat for Clearing the OLD_SEL_INDEX
 	ld a, (OLD_CUR_INDEX)
 	ld h, a
-	ld e, 40
+	ld e, CUR_ROW_LENGTH
 	call Mult8x8
 	ld de, VRM_WRK_AREA
 	add hl, de
-	ld de, 80
+	ld de, CUR_ROW_OFFSET
 	add hl, de
 	ld (hl), SPACE_CODE
 	ret

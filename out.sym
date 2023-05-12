@@ -1,5 +1,5 @@
 Sections:
-00: "seg4000" (4000-44A0)
+00: "seg4000" (4000-44A1)
 
 
 Source: "./main.asm"
@@ -91,36 +91,48 @@ Source: "CHAR_CODES.asm"
                         	     8: 
 
 Source: "./main.asm"
-                        	     7: 	include "WORKING_VARIABLES.asm"
+                        	     7: 	include "CURSOR_VARIABLES.asm"
 
-Source: "WORKING_VARIABLES.asm"
+Source: "CURSOR_VARIABLES.asm"
                         	     1: CUR_INDEX:	equ $C001	; Current index of the Cursor
                         	     2: OLD_CUR_INDEX:	equ $C002	; The last index of the Cursor
                         	     3: CUR_GAME:	equ $C003	; The game that was selected
                         	     4: CUR_PAGE:	equ $C004	; The page number
-                        	     5: VRM_WRK_AREA:	equ $C100	; Base address for the RAM copy of the VRAM Buffer
-                        	     6: 
+                        	     5: 
 
 Source: "./main.asm"
-                        	     8: 	include "CONSTANTS.asm"
+                        	     8: 	include "VRAM_VARIABLES.asm"
 
-Source: "CONSTANTS.asm"
+Source: "VRAM_VARIABLES.asm"
+                        	     1: VRM_WRK_AREA:	equ $C100	; Base address for the RAM copy of the VRAM Buffer
+                        	     2: 
+
+Source: "./main.asm"
+                        	     9: 	include "MAIN_CONSTANTS.asm"
+
+Source: "MAIN_CONSTANTS.asm"
                         	     1: ORGADDR	equ $4000	; Origin for the ROM
-                        	     2: COM_ACTION_REG:	equ $6FF0	; The command is written here for the Firmware to read
-                        	     3: COM_INDEX_REG:	equ $6FF1	; The index for the ROM to load in the current page
-                        	     4: COM_ACK_REG:	equ $6FFE	; The Firmware will write the ACK value here for Bootloader to check
-                        	     5: COM_START:	equ $7000	; Addresses from 0x7000 to 0x7FFF will trigger the command flow on the Firmware
-                        	     6: 
-                        	     7: COM_ACT_PU:	equ $40		; Value for Page Up
-                        	     8: COM_ACT_PD:	equ $4F		; Value for Page Down
-                        	     9: COM_ACT_PROG:	equ $60		; Value for Program
-                        	    10: COM_ACT_DIRIN:	equ $50		; Value for Entering a Dir (Not in v0)
-                        	    11: COM_ACT_DIROUT:	equ $5F		; Value for Backing out of a Dir (Not in v0)
-                        	    12: 
+                        	     2: 
 
 Source: "./main.asm"
-                        	     9: 
-                        	    10: 	include "CART_HEADER.asm"
+                        	    10: 	include "COMMAND_CONSTANTS.asm"
+
+Source: "COMMAND_CONSTANTS.asm"
+                        	     1: COM_ACTION_REG:	equ $6FF0	; The command is written here for the Firmware to read
+                        	     2: COM_INDEX_REG:	equ $6FF1	; The index for the ROM to load in the current page
+                        	     3: COM_ACK_REG:	equ $6FFE	; The Firmware will write the ACK value here for Bootloader to check
+                        	     4: COM_START:	equ $7000	; Addresses from 0x7000 to 0x7FFF will trigger the command flow on the Firmware
+                        	     5: 
+                        	     6: COM_ACT_PU:	equ $40		; Value for Page Up
+                        	     7: COM_ACT_PD:	equ $4F		; Value for Page Down
+                        	     8: COM_ACT_PROG:	equ $60		; Value for Program
+                        	     9: COM_ACT_DIRIN:	equ $50		; Value for Entering a Dir (Not in v0)
+                        	    10: COM_ACT_DIROUT:	equ $5F		; Value for Backing out of a Dir (Not in v0)
+                        	    11: 
+
+Source: "./main.asm"
+                        	    11: 
+                        	    12: 	include "CART_HEADER.asm"
 
 Source: "CART_HEADER.asm"
                         	     1: ;;; Header for the Cartridge to be recognised by the MSX
@@ -128,7 +140,7 @@ Source: "CART_HEADER.asm"
                         	     3: 	org ORGADDR
                         	     4: 				
 00:4000 4142            	     5: 	db "AB"
-00:4002 2F44            	     6: 	dw Init
+00:4002 6E44            	     6: 	dw Init
 00:4004 0000            	     7: 	dw 0, 0, 0, 0, 0, 0
 00:4006 0000
 00:4008 0000
@@ -138,8 +150,8 @@ Source: "CART_HEADER.asm"
                         	     8: 
 
 Source: "./main.asm"
-                        	    11: 
-                        	    12: 	include "VRAM_BUFFER.asm"
+                        	    13: 
+                        	    14: 	include "VRAM_BUFFER.asm"
 
 Source: "VRAM_BUFFER.asm"
                         	     1: VRAM_BUFFER:
@@ -327,181 +339,214 @@ Source: "VRAM_BUFFER.asm"
                         	    28: 
 
 Source: "./main.asm"
-                        	    13: 	
-                        	    14: TOTAL_PAGES:
-00:43D1 1E00            	    15: 	dw 30
-                        	    16: 
-                        	    17: 	include "CURSOR_FUNCTIONS.asm"
+                        	    15: 	
+                        	    16: TOTAL_PAGES:
+00:43D1 1E00            	    17: 	dw 30
+                        	    18: 
+                        	    19: 	include "CURSOR_FUNCTIONS.asm"
 
 Source: "CURSOR_FUNCTIONS.asm"
-                        	     1: IncrementCursor:
-00:43D3 2A01C0          	     2: 	ld hl, (CUR_INDEX)
-00:43D6 7D              	     3: 	ld a, l
-00:43D7 3202C0          	     4: 	ld (OLD_CUR_INDEX),a
-00:43DA 23              	     5: 	inc hl
-00:43DB 7D              	     6: 	ld a, l
-00:43DC FE15            	     7: 	cp $15
-00:43DE CC2A44          	     8: 	call z, ZeroCursor
-00:43E1 3201C0          	     9: 	ld (CUR_INDEX), a
-00:43E4 CD0344          	    10: 	call UpdateCursor
-00:43E7 CD4E44          	    11: 	call CopyWorkBufferToVRAM
-00:43EA C9              	    12: 	ret
-                        	    13: 
-                        	    14: DecrementCursor:
-00:43EB 2A01C0          	    15: 	ld hl, (CUR_INDEX)
-00:43EE 7D              	    16: 	ld a, l
-00:43EF 3202C0          	    17: 	ld (OLD_CUR_INDEX),a
-00:43F2 2B              	    18: 	dec hl
-00:43F3 7D              	    19: 	ld a, l
-00:43F4 FEFF            	    20: 	cp $FF
-00:43F6 CC2C44          	    21: 	call z, ClampCursor
-00:43F9 3201C0          	    22: 	ld (CUR_INDEX), a
-00:43FC CD0344          	    23: 	call UpdateCursor
-00:43FF CD4E44          	    24: 	call CopyWorkBufferToVRAM
-00:4402 C9              	    25: 	ret
-                        	    26: 
-                        	    27: UpdateCursor:
-                        	    28: 	;; First we Add the new cursor to the Buffer
-                        	    29: 	;; We load the CUR_SEL into de, and multiply it by 40
-                        	    30: 	;; to get the row we are on
-00:4403 3A01C0          	    31: 	ld a, (CUR_INDEX)
-00:4406 67              	    32: 	ld h, a
-00:4407 1E28            	    33: 	ld e, 40
-00:4409 CD6844          	    34: 	call Mult8x8
-                        	    35: 	;; We then add the base address of the Buffer to the HL result
-00:440C 1100C1          	    36: 	ld de, VRM_WRK_AREA
-00:440F 19              	    37: 	add hl, de
-                        	    38: 	;; We finally add a standard offset of 80 to get it started on the right row
-00:4410 115000          	    39: 	ld de, 80
-00:4413 19              	    40: 	add hl, de
-                        	    41: 	;; We then Write the character to the location in RAM
-00:4414 36CF            	    42: 	ld (hl), POINTER_CODE
-                        	    43: 	;; We repeat for Clearing the OLD_SEL_INDEX
-00:4416 3A02C0          	    44: 	ld a, (OLD_CUR_INDEX)
-00:4419 67              	    45: 	ld h, a
-00:441A 1E28            	    46: 	ld e, 40
-00:441C CD6844          	    47: 	call Mult8x8
-00:441F 1100C1          	    48: 	ld de, VRM_WRK_AREA
-00:4422 19              	    49: 	add hl, de
-00:4423 115000          	    50: 	ld de, 80
-00:4426 19              	    51: 	add hl, de
-00:4427 3620            	    52: 	ld (hl), SPACE_CODE
-00:4429 C9              	    53: 	ret
-                        	    54: 
-                        	    55: ZeroCursor:
-00:442A AF              	    56: 	xor a
-00:442B C9              	    57: 	ret
-                        	    58: 
-                        	    59: ClampCursor:
-00:442C 3E14            	    60: 	ld a, $14
-00:442E C9              	    61: 	ret
-                        	    62: 
+                        	     1: 	include "CURSOR_CONSTANTS.asm"
+
+Source: "CURSOR_CONSTANTS.asm"
+                        	     1: CUR_ROW_LENGTH:	equ 40
+                        	     2: CUR_ROW_OFFSET:	equ 40*2
+                        	     3: 	
+                        	     4: 
+
+Source: "CURSOR_FUNCTIONS.asm"
+                        	     2: 	
+                        	     3: IncrementCursor:
+00:43D3 2A01C0          	     4: 	ld hl, (CUR_INDEX)
+00:43D6 7D              	     5: 	ld a, l
+00:43D7 3202C0          	     6: 	ld (OLD_CUR_INDEX),a
+00:43DA 23              	     7: 	inc hl
+00:43DB 7D              	     8: 	ld a, l
+00:43DC FE15            	     9: 	cp $15
+00:43DE CC2A44          	    10: 	call z, ZeroCursor
+00:43E1 3201C0          	    11: 	ld (CUR_INDEX), a
+00:43E4 CD0344          	    12: 	call UpdateCursor
+00:43E7 CD2F44          	    13: 	call CopyWorkBufferToVRAM
+00:43EA C9              	    14: 	ret
+                        	    15: 
+                        	    16: DecrementCursor:
+00:43EB 2A01C0          	    17: 	ld hl, (CUR_INDEX)
+00:43EE 7D              	    18: 	ld a, l
+00:43EF 3202C0          	    19: 	ld (OLD_CUR_INDEX),a
+00:43F2 2B              	    20: 	dec hl
+00:43F3 7D              	    21: 	ld a, l
+00:43F4 FEFF            	    22: 	cp $FF
+00:43F6 CC2C44          	    23: 	call z, ClampCursor
+00:43F9 3201C0          	    24: 	ld (CUR_INDEX), a
+00:43FC CD0344          	    25: 	call UpdateCursor
+00:43FF CD2F44          	    26: 	call CopyWorkBufferToVRAM
+00:4402 C9              	    27: 	ret
+                        	    28: 
+                        	    29: UpdateCursor:
+                        	    30: 	;; First we Add the new cursor to the Buffer
+                        	    31: 	;; We load the CUR_SEL into de, and multiply it by 40
+                        	    32: 	;; to get the row we are on
+00:4403 3A01C0          	    33: 	ld a, (CUR_INDEX)
+00:4406 67              	    34: 	ld h, a
+00:4407 1E28            	    35: 	ld e, CUR_ROW_LENGTH
+00:4409 CD4944          	    36: 	call Mult8x8
+                        	    37: 	;; We then add the base address of the Buffer to the HL result
+00:440C 1100C1          	    38: 	ld de, VRM_WRK_AREA
+00:440F 19              	    39: 	add hl, de
+                        	    40: 	;; We finally add a standard offset of 80 to get it started on the right row
+00:4410 115000          	    41: 	ld de, CUR_ROW_OFFSET
+00:4413 19              	    42: 	add hl, de
+                        	    43: 	;; We then Write the character to the location in RAM
+00:4414 36CF            	    44: 	ld (hl), POINTER_CODE
+                        	    45: 	;; We repeat for Clearing the OLD_SEL_INDEX
+00:4416 3A02C0          	    46: 	ld a, (OLD_CUR_INDEX)
+00:4419 67              	    47: 	ld h, a
+00:441A 1E28            	    48: 	ld e, CUR_ROW_LENGTH
+00:441C CD4944          	    49: 	call Mult8x8
+00:441F 1100C1          	    50: 	ld de, VRM_WRK_AREA
+00:4422 19              	    51: 	add hl, de
+00:4423 115000          	    52: 	ld de, CUR_ROW_OFFSET
+00:4426 19              	    53: 	add hl, de
+00:4427 3620            	    54: 	ld (hl), SPACE_CODE
+00:4429 C9              	    55: 	ret
+                        	    56: 
+                        	    57: ZeroCursor:
+00:442A AF              	    58: 	xor a
+00:442B C9              	    59: 	ret
+                        	    60: 
+                        	    61: ClampCursor:
+00:442C 3E14            	    62: 	ld a, $14
+00:442E C9              	    63: 	ret
+                        	    64: 
 
 Source: "./main.asm"
-                        	    18: 				; ==[ Program ]=============================================
-                        	    19: Init:
-                        	    20: 	;; Set Screen Mode to 0
-00:442F CD6C00          	    21: 	call INITXT
-                        	    22: 	;; Set Pallette to White on Black
-00:4432 3E01            	    23: 	ld a, 1
-00:4434 32EAF3          	    24: 	ld (BAKCLR), a
-00:4437 32EBF3          	    25: 	ld (BDCLR), a
-00:443A 3E00            	    26: 	ld a, 0
-00:443C 3201C0          	    27: 	ld (CUR_INDEX),a
-00:443F 3202C0          	    28: 	ld (OLD_CUR_INDEX),a
-00:4442 CD6200          	    29: 	call CHGCLR
-                        	    30: 	;; Copy the VRAM_BUFFER to RAM so that we can update it
-00:4445 CD5C44          	    31: 	call CopyBufferToRam
-                        	    32: 	;; Copy the VRAM_BUFFER in RAM to VRAM
-00:4448 CD4E44          	    33: 	call CopyWorkBufferToVRAM
-00:444B CD9A44          	    34: 	call MainLoop
-                        	    35: 
-                        	    36: CopyWorkBufferToVRAM:
-00:444E 01C003          	    37: 	ld bc, 960
-00:4451 ED5BB3F3        	    38: 	ld de, (TXTNAM)
-00:4455 2100C1          	    39: 	ld hl, VRM_WRK_AREA
-00:4458 CD5C00          	    40: 	call LDIRVM
-00:445B C9              	    41: 	ret
-                        	    42: 	
-                        	    43: CopyBufferToRam:
-00:445C 211040          	    44: 	ld hl, VRAM_BUFFER
-00:445F 1100C1          	    45: 	ld de, VRM_WRK_AREA
-00:4462 01C003          	    46: 	ld bc, 960
-00:4465 EDB0            	    47: 	ldir
-00:4467 C9              	    48: 	ret
-                        	    49: 	
+                        	    20: 	include "VRAM_FUNCTIONS.asm"
+
+Source: "VRAM_FUNCTIONS.asm"
+                        	     1: ;;; TODO: Comment these functions
+                        	     2: 	
+                        	     3: CopyWorkBufferToVRAM:
+00:442F 01C003          	     4: 	ld bc, 960
+00:4432 ED5BB3F3        	     5: 	ld de, (TXTNAM)
+00:4436 2100C1          	     6: 	ld hl, VRM_WRK_AREA
+00:4439 CD5C00          	     7: 	call LDIRVM
+00:443C C9              	     8: 	ret
+                        	     9: 	
+                        	    10: CopyBufferToRam:
+00:443D 211040          	    11: 	ld hl, VRAM_BUFFER
+00:4440 1100C1          	    12: 	ld de, VRM_WRK_AREA
+00:4443 01C003          	    13: 	ld bc, 960
+00:4446 EDB0            	    14: 	ldir
+00:4448 C9              	    15: 	ret
+                        	    16: 
+
+Source: "./main.asm"
+                        	    21: 	include "MATH_FUNCTIONS.asm"
+
+Source: "MATH_FUNCTIONS.asm"
+                        	     1: ;;; Mult h by e and place in hl
+                        	     2: Mult8x8:
+00:4449 1600            	     3: 	ld d, 0
+00:444B CB24            	     4: 	sla h
+00:444D 9F              	     5: 	sbc a, a
+00:444E A3              	     6: 	and e
+00:444F 6F              	     7: 	ld l,a
+00:4450 0607            	     8: 	ld b, 7
+                        	     9: _Mult8x8_Loop:
+00:4452 29              	    10: 	add hl, hl
+00:4453 3001            	    11: 	jr nc, $+3
+00:4455 19              	    12: 	add hl, de
+00:4456 10FA            	    13: 	djnz _Mult8x8_Loop
+00:4458 C9              	    14: 	ret
+                        	    15: 
+                        	    16: ;;; Mult DE by A and store Result in AHL
+                        	    17: Mult8x16:
+00:4459 0E00            	    18: 	ld c, 0
+00:445B 61              	    19: 	ld h, c
+00:445C 6C              	    20: 	ld l, h
+00:445D 87              	    21: 	add a, a
+00:445E 3002            	    22: 	jr nc, $+4
+00:4460 62              	    23: 	ld h,d
+00:4461 6B              	    24: 	ld l,e
+00:4462 0607            	    25: 	ld b,7
+                        	    26: _Mult8x16_Loop:
+00:4464 29              	    27: 	add hl, hl
+00:4465 17              	    28: 	rla
+00:4466 3002            	    29: 	jr nc, $+4
+00:4468 19              	    30: 	add hl, de
+00:4469 89              	    31: 	adc a, c
+00:446A 10F8            	    32: 	djnz _Mult8x16_Loop
+00:446C C9              	    33: 	ret
+                        	    34: 
+
+Source: "./main.asm"
+                        	    22: 	include "INPUT_FUNCTIONS.asm"
+
+Source: "INPUT_FUNCTIONS.asm"
+                        	     1: CHECK_INPUT:
+00:446D 00              	     2: 	nop
+                        	     3: 
+
+Source: "./main.asm"
+                        	    23: 				; ==[ Program ]=============================================
+                        	    24: Init:
+                        	    25: 	;; Set Screen Mode to 0
+00:446E CD6C00          	    26: 	call INITXT
+                        	    27: 	;; Set Pallette to White on Black
+00:4471 3E01            	    28: 	ld a, 1
+00:4473 32EAF3          	    29: 	ld (BAKCLR), a
+00:4476 32EBF3          	    30: 	ld (BDCLR), a
+00:4479 3E00            	    31: 	ld a, 0
+00:447B 3201C0          	    32: 	ld (CUR_INDEX),a
+00:447E 3202C0          	    33: 	ld (OLD_CUR_INDEX),a
+00:4481 CD6200          	    34: 	call CHGCLR
+                        	    35: 	;; Copy the VRAM_BUFFER to RAM so that we can update it
+00:4484 CD3D44          	    36: 	call CopyBufferToRam
+                        	    37: 	;; Copy the VRAM_BUFFER in RAM to VRAM
+00:4487 CD2F44          	    38: 	call CopyWorkBufferToVRAM
+00:448A CD9B44          	    39: 	call MainLoop
+                        	    40: 
+                        	    41: 
+                        	    42: 
+                        	    43: CheckInput:
+00:448D CD9F00          	    44: 	call CHGET
+00:4490 FE1E            	    45: 	cp 30
+00:4492 CCEB43          	    46: 	call z, DecrementCursor
+00:4495 FE1F            	    47: 	cp 31
+00:4497 CCD343          	    48: 	call z, IncrementCursor
+00:449A C9              	    49: 	ret
                         	    50: 
-                        	    51: 
-                        	    52: ;;; Mult h by e and place in hl
-                        	    53: Mult8x8:
-00:4468 1600            	    54: 	ld d, 0
-00:446A CB24            	    55: 	sla h
-00:446C 9F              	    56: 	sbc a, a
-00:446D A3              	    57: 	and e
-00:446E 6F              	    58: 	ld l,a
-00:446F 0607            	    59: 	ld b, 7
-                        	    60: Mult8_8_loop:
-00:4471 29              	    61: 	add hl, hl
-00:4472 3001            	    62: 	jr nc, $+3
-00:4474 19              	    63: 	add hl, de
-00:4475 10FA            	    64: 	djnz Mult8_8_loop
-00:4477 C9              	    65: 	ret
-                        	    66: ;;; Mult DE by A and store Result in AHL
-                        	    67: Mult8x16:
-00:4478 0E00            	    68: 	ld c, 0
-00:447A 61              	    69: 	ld h, c
-00:447B 6C              	    70: 	ld l, h
-00:447C 87              	    71: 	add a, a
-00:447D 3002            	    72: 	jr nc, $+4
-00:447F 62              	    73: 	ld h,d
-00:4480 6B              	    74: 	ld l,e
-00:4481 0607            	    75: 	ld b,7
-                        	    76: Mult8_16_loop:
-00:4483 29              	    77: 	add hl, hl
-00:4484 17              	    78: 	rla
-00:4485 3002            	    79: 	jr nc, $+4
-00:4487 19              	    80: 	add hl, de
-00:4488 89              	    81: 	adc a, c
-00:4489 10F8            	    82: 	djnz Mult8_16_loop
-00:448B C9              	    83: 	ret
-                        	    84: 	
-                        	    85: 	
-                        	    86: CheckInput:
-00:448C CD9F00          	    87: 	call CHGET
-00:448F FE1E            	    88: 	cp 30
-00:4491 CCEB43          	    89: 	call z, DecrementCursor
-00:4494 FE1F            	    90: 	cp 31
-00:4496 CCD343          	    91: 	call z, IncrementCursor
-00:4499 C9              	    92: 	ret
-                        	    93: 
-                        	    94: MainLoop:
-00:449A F3              	    95: 	di
-00:449B CD8C44          	    96: 	call CheckInput
-00:449E 18FA            	    97: 	jr MainLoop
-                        	    98: 		
-                        	    99: 
+                        	    51: MainLoop:
+00:449B F3              	    52: 	di
+00:449C CD8D44          	    53: 	call CheckInput
+00:449F 18FA            	    54: 	jr MainLoop
+                        	    55: 		
+                        	    56: 
 
 
 Symbols by name:
+_Mult8x16_Loop                   A:4464
+_Mult8x8_Loop                    A:4452
 BAKCLR                           E:F3EA
 BDCLR                            E:F3EB
-CheckInput                       A:448C
+CHECK_INPUT                      A:446D
+CheckInput                       A:448D
 CHGCLR                           E:0062
 CHGET                            E:009F
 ClampCursor                      A:442C
-CopyBufferToRam                  A:445C
-CopyWorkBufferToVRAM             A:444E
+CopyBufferToRam                  A:443D
+CopyWorkBufferToVRAM             A:442F
 CUR_INDEX                        E:C001
+CUR_ROW_LENGTH                   E:0028
+CUR_ROW_OFFSET                   E:0050
 DecrementCursor                  A:43EB
 IncrementCursor                  A:43D3
-Init                             A:442F
+Init                             A:446E
 INITXT                           E:006C
 LDIRVM                           E:005C
-MainLoop                         A:449A
-Mult8_16_loop                    A:4483
-Mult8_8_loop                     A:4471
-Mult8x16                         A:4478
-Mult8x8                          A:4468
+MainLoop                         A:449B
+Mult8x16                         A:4459
+Mult8x8                          A:4449
 OLD_CUR_INDEX                    E:C002
 ORGADDR                          E:4000
 POINTER_CODE                     E:00CF
@@ -516,6 +561,8 @@ ZeroCursor                       A:442A
 
 Symbols by value:
 0020 SPACE_CODE
+0028 CUR_ROW_LENGTH
+0050 CUR_ROW_OFFSET
 005C LDIRVM
 0062 CHGCLR
 006C INITXT
@@ -530,15 +577,16 @@ Symbols by value:
 4403 UpdateCursor
 442A ZeroCursor
 442C ClampCursor
-442F Init
-444E CopyWorkBufferToVRAM
-445C CopyBufferToRam
-4468 Mult8x8
-4471 Mult8_8_loop
-4478 Mult8x16
-4483 Mult8_16_loop
-448C CheckInput
-449A MainLoop
+442F CopyWorkBufferToVRAM
+443D CopyBufferToRam
+4449 Mult8x8
+4452 _Mult8x8_Loop
+4459 Mult8x16
+4464 _Mult8x16_Loop
+446D CHECK_INPUT
+446E Init
+448D CheckInput
+449B MainLoop
 C001 CUR_INDEX
 C002 OLD_CUR_INDEX
 C100 VRM_WRK_AREA

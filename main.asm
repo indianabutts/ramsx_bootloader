@@ -6,8 +6,10 @@
 	include "CHAR_CODES.asm"
 	include "CURSOR_VARIABLES.asm"
 	include "VRAM_VARIABLES.asm"
+	include "INPUT_VARIABLES.asm"
 	include "MAIN_CONSTANTS.asm"
 	include "COMMAND_CONSTANTS.asm"
+	include "INPUT_CONSTANTS.asm"
 
 	include "CART_HEADER.asm"
 
@@ -43,13 +45,14 @@ Init:
 CheckBiosInput:
 	call CHGET
 	cp UP_CODE
-	call z, DecrementCursor
+	call z, Cursor_DecrementIndex
 	cp DOWN_CODE
-	call z, IncrementCursor
+	call z, Cursor_DecrementIndex
 	ret
 
 MainLoop:
 	di
-	call CheckBiosInput
+	call Input_UpdateInputBuffers
+	call Cursor_CheckInput
 	jr MainLoop
 		

@@ -1,32 +1,48 @@
 	include "CURSOR_CONSTANTS.asm"
+
+Cursor_CheckInput:
+	ld hl,(INPUT_NAV_STATE)
+	ld a, h
+	ld hl, (INPUT_NAV_PREV_STATE)
+	ld b, h
+	cp b
+	jr z, _Cursor_CheckInput_HeldInput 
+	cp $DF
+	call z, Cursor_DecrementIndex
+	cp $BF
+	call z, Cursor_IncrementIndex
+	ret
+_Cursor_CheckInput_HeldInput:
+	ret
 	
-IncrementCursor:
+	
+Cursor_IncrementIndex:
 	ld hl, (CUR_INDEX)
 	ld a, l
 	ld (OLD_CUR_INDEX),a
 	inc hl
 	ld a, l
 	cp $15
-	call z, ZeroCursor
+	call z, _Cursor_ZeroIndex
 	ld (CUR_INDEX), a
-	call UpdateCursor
+	call _Cursor_UpdateScreenPosition
 	call CopyWorkBufferToVRAM
 	ret
 
-DecrementCursor:
+Cursor_DecrementIndex:
 	ld hl, (CUR_INDEX)
 	ld a, l
 	ld (OLD_CUR_INDEX),a
 	dec hl
 	ld a, l
 	cp $FF
-	call z, ClampCursor
+	call z, _Cursor_ClampIndex
 	ld (CUR_INDEX), a
-	call UpdateCursor
+	call _Cursor_UpdateScreenPosition
 	call CopyWorkBufferToVRAM
 	ret
 
-UpdateCursor:
+_Cursor_UpdateScreenPosition:
 	;; First we Add the new cursor to the Buffer
 	;; We load the CUR_SEL into de, and multiply it by 40
 	;; to get the row we are on
@@ -52,12 +68,11 @@ UpdateCursor:
 	ld de, CUR_ROW_OFFSET
 	add hl, de
 	ld (hl), SPACE_CODE
-	ret
 
-ZeroCursor:
+_Cursor_ZeroIndex:
 	xor a
 	ret
 
-ClampCursor:
+_Cursor_ClampIndex:
 	ld a, $14
 	ret

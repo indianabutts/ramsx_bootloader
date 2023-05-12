@@ -48,3 +48,13 @@ INITXT:	equ #006C
 ;;;       Registers: AF
 ;;; ====================================================	
 CHGET equ $009F
+
+;;; ====================================================
+;;; Returns the value of the specified line from the keyboard matrix
+;;; Input:
+;;; 	  A - The specified line 
+;;; Output:
+;;;       A - Data with Key Press represented as 0
+;;;       Registers: AF
+;;; ====================================================	
+SNSMAT equ $0141

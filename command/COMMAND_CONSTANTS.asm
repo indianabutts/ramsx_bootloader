@@ -8,3 +8,6 @@ COM_ACT_PD:	equ $4F		; Value for Page Down
 COM_ACT_PROG:	equ $60		; Value for Program
 COM_ACT_DIRIN:	equ $50		; Value for Entering a Dir (Not in v0)
 COM_ACT_DIROUT:	equ $5F		; Value for Backing out of a Dir (Not in v0)
+
+
+COM_ACK_VALUE:	equ $A2

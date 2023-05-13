@@ -29,7 +29,17 @@ Command_Search:
 	ret
 _Command_Search_Setup
 	nop
-	
+
+
+_Command_WaitForAck:
+	ld a, (COM_ACK_REG)
+	cp COM_ACK_VALUE
+	;; jr nz, _Command_WaitForAck 
+	xor a
+	ld (COM_ACK_REG), a
+	ret
+_Command_WaitForAck_End:
+	nop
 ;;; Function: Runs the Programming Command Flow
 ;;; This function is special since it gets copied into
 ;;; RAM along with _Command_WaitForAck so that once the
@@ -48,19 +58,10 @@ Command_ProgramRom:
 	nop
 	nop
 	nop
-	call _Command_WaitForAck
+	call COM_ACK_RAM_AREA
 	ei
 	call $0000
-	ret
-
-_Command_WaitForAck:
-	ld a, (COM_ACK_REG)
-	cp COM_ACK_VALUE
-	;; jr nz, _Command_WaitForAck 
-	xor a
-	ld (COM_ACK_REG), a
-	ret
-	
+	ret	
 _Command_ProgramRom_End:
 	nop
 
@@ -69,6 +70,10 @@ Command_CopyProgramFunctionsToRAM:
 	ld hl, Command_ProgramRom
 	ld de, COM_PROG_RAM_AREA
 	ld bc, _Command_ProgramRom_End - Command_ProgramRom
+	ldir
+	ld hl, _Command_WaitForAck
+	ld de, COM_ACK_RAM_AREA
+	ld bc, _Command_WaitForAck_End - _Command_WaitForAck
 	ldir
 	ret
 	

@@ -14,3 +14,4 @@ COM_ACK_VALUE:	equ $A2
 
 
 COM_PROG_RAM_AREA:	equ $C900 ;Where the Command_ProgramRom will be copied to
+COM_ACK_RAM_AREA:	equ $CA00 ;Where Wait for Ack Will Be Copied

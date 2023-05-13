@@ -14,7 +14,6 @@ Command_CheckInput:
 	add hl, de
 	jp z, _Command_CheckInput_Held
 	;; Now start comparing for functioanlity
-	ld hl, (INPUT_STATE)
 	ld a, $FE
 	cp h
 	call z, COM_PROG_RAM_AREA
@@ -65,7 +64,7 @@ Command_ProgramRom:
 	nop
 	call COM_ACK_RAM_AREA
 	ei
-	call $0000
+	call CHKRAM
 	ret	
 _Command_ProgramRom_End:
 	nop

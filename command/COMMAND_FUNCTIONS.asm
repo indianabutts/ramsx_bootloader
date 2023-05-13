@@ -1,20 +1,24 @@
 Command_CheckInput:
+	;; Check if Input is Idle and backout
 	ld hl, (INPUT_STATE)
 	ld de, $FFFF
 	or a
 	sbc hl, de
 	add hl, de
 	jp z, _Command_CheckInput_Held
+	;; Check if Prev and Cur are the same, if so,
+	;; juump to input held logic
+	ld de, (INPUT_PREV_STATE)
+	or a
+	sbc hl, de
+	add hl, de
+	jp z, _Command_CheckInput_Held
+	;; Now start comparing for functioanlity
 	ld hl, (INPUT_STATE)
-	ld a, h
-	ld hl, (INPUT_PREV_STATE)
-	ld b, h
-	cp b,
-	jr z, _Command_CheckInput_Held
-	cp $FE
+	ld a, $FE
+	cp h
 	call z, COM_PROG_RAM_AREA
-	ld a, l
-	cp $FE
+	cp l
 	call z, Command_Search
 	ret
 _Command_CheckInput_Held:
@@ -27,6 +31,7 @@ Command_Search:
 	call VRAM_SetStatusBar
 	call VRAM_CopyWorkBufferToVDP
 	ret
+	
 _Command_Search_Setup
 	nop
 

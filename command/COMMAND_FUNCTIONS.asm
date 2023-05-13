@@ -31,7 +31,7 @@ Command_ProgramRom:
 _Command_WaitForAck:
 	ld a, (COM_ACK_REG)
 	cp COM_ACK_VALUE
-	jr nz, _Command_WaitForAck
+	;; jr nz, _Command_WaitForAck 
 	xor a
 	ld (COM_ACK_REG), a
 	ret

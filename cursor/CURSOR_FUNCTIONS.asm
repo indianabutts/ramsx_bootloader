@@ -6,13 +6,13 @@ Cursor_CheckInput:
 	ld hl, (INPUT_PREV_STATE)
 	ld b, h
 	cp b
-	jr z, _Cursor_CheckInput_HeldInput 
+	jr z, _Cursor_CheckInput_Held
 	cp $DF
 	call z, Cursor_DecrementIndex
 	cp $BF
 	call z, Cursor_IncrementIndex
 	ret
-_Cursor_CheckInput_HeldInput:
+_Cursor_CheckInput_Held:
 	ret
 	
 	
@@ -26,7 +26,7 @@ Cursor_IncrementIndex:
 	call z, _Cursor_ZeroIndex
 	ld (CUR_INDEX), a
 	call _Cursor_UpdateScreenPosition
-	call CopyWorkBufferToVRAM
+	call VRAM_CopyWorkBufferToVDP
 	ret
 
 Cursor_DecrementIndex:
@@ -39,7 +39,7 @@ Cursor_DecrementIndex:
 	call z, _Cursor_ClampIndex
 	ld (CUR_INDEX), a
 	call _Cursor_UpdateScreenPosition
-	call CopyWorkBufferToVRAM
+	call VRAM_CopyWorkBufferToVDP
 	ret
 
 _Cursor_UpdateScreenPosition:
@@ -51,7 +51,7 @@ _Cursor_UpdateScreenPosition:
 	ld e, CUR_ROW_LENGTH
 	call Mult8x8
 	;; We then add the base address of the Buffer to the HL result
-	ld de, VRM_WRK_AREA
+	ld de, VRAM_WRK_AREA
 	add hl, de
 	;; We finally add a standard offset of 80 to get it started on the right row
 	ld de, CUR_ROW_OFFSET
@@ -63,7 +63,7 @@ _Cursor_UpdateScreenPosition:
 	ld h, a
 	ld e, CUR_ROW_LENGTH
 	call Mult8x8
-	ld de, VRM_WRK_AREA
+	ld de, VRAM_WRK_AREA
 	add hl, de
 	ld de, CUR_ROW_OFFSET
 	add hl, de

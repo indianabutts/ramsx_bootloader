@@ -11,3 +11,6 @@ COM_ACT_DIROUT:	equ $5F		; Value for Backing out of a Dir (Not in v0)
 
 
 COM_ACK_VALUE:	equ $A2
+
+
+COM_PROG_RAM_AREA:	equ $C900 ;Where the Command_ProgramRom will be copied to

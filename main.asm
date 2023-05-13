@@ -10,7 +10,7 @@
 	include "MAIN_CONSTANTS.asm"
 	include "command/COMMAND_CONSTANTS.asm"
 	include "input/INPUT_CONSTANTS.asm"
-
+	include "vram/VRAM_CONSTANTS.asm"
 	include "utils/CART_HEADER.asm"
 
 	include "vram/VRAM_BUFFER.asm"
@@ -35,10 +35,11 @@ Init:
 	ld (CUR_INDEX),a
 	ld (OLD_CUR_INDEX),a
 	call CHGCLR
+	call Command_CopyProgramFunctionsToRAM
 	;; Copy the VRAM_BUFFER to RAM so that we can update it
-	call CopyBufferToRam
+	call VRAM_CopyBufferToRam
 	;; Copy the VRAM_BUFFER in RAM to VRAM
-	call CopyWorkBufferToVRAM
+	call VRAM_CopyWorkBufferToVDP
 	call MainLoop
 
 MainLoop:
@@ -47,4 +48,6 @@ MainLoop:
 	call Cursor_CheckInput
 	call Command_CheckInput
 	jr MainLoop
+
+	include "command/COMMAND_DATA.asm"
 		

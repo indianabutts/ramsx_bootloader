@@ -1,23 +1,31 @@
 Command_CheckInput:
-	;; Check if Input is Idle and backout
-	ld hl, (INPUT_STATE)
-	ld de, $FFFF
-	or a
-	sbc hl, de
-	add hl, de
-	jp z, _Command_CheckInput_Held
-	;; Check if Prev and Cur are the same, if so,
-	;; juump to input held logic
-	ld de, (INPUT_PREV_STATE)
-	or a
-	sbc hl, de
-	add hl, de
-	jp z, _Command_CheckInput_Held
-	;; Now start comparing for functioanlity
-	ld a, $FE
-	cp h
+_Command_CheckInput_Row8
+	;; Checking Row 8 for SPACE, <-, ->
+	ld hl, INPUT_STATE+8
+	ld a, (hl)
+	ld hl, INPUT_PREV_STATE+8
+	ld b, (hl)
+	cp b
+	jr z, _Command_CheckInput_Row5
+	;; Check for SPACE = Program Rom
+	cp $FE
 	call z, COM_PROG_RAM_AREA
-	cp l
+	;; Check for -> = Page Up
+	cp $EF
+	jr z, _Command_CheckInput_Held
+	;; Check for <- = Page Down
+	cp $7F
+	jr z, _Command_CheckInput_Held
+_Command_CheckInput_Row5:
+	;; Second Stage is ROW 5, to Check for one of the other commands
+	;; - Search ($FE)
+	ld hl, INPUT_STATE+5
+	ld a, (hl)
+	ld hl, INPUT_PREV_STATE+5
+	ld b, (hl)
+	cp b
+	jr z, _Command_CheckInput_Held
+	cp $FE
 	call z, Command_Search
 	ret
 _Command_CheckInput_Held:

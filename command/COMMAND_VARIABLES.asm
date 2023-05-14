@@ -1,0 +1,2 @@
+COM_SEARCH_LENGTH:
+	db 0

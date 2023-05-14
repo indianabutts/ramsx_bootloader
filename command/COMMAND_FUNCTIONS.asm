@@ -46,6 +46,7 @@ _Command_Search_ReadTextInput:
 	jr z, _Command_Search_Complete
 	;; CAPS $41-$5A
 	;; LOWER CAPS + $20
+	call Input_UpdateInputBuffers
 	jr _Command_Search_ReadTextInput
 	
 _Command_Search_Setup:	

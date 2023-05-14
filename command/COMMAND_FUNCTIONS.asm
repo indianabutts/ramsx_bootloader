@@ -25,26 +25,19 @@ _Command_CheckInput_Held:
 	
 
 Command_Search:
+	;; Copy the current Status Bar to RAM
 	call VRAM_BackupStatusBar
+	;; Transfer the Initial Search Bar into VRAM
 	ld hl, COM_SEARCH_STATUS_BAR
 	call VRAM_SetStatusBar
 	call VRAM_CopyWorkBufferToVDP
-	ei
-	ld hl, $0100
-	call POSIT
+	xor a
+	ld (COM_SEARCH_LENGTH), a
 _Command_Search_ReadInput:
-	ei
-	call CHGET
-	di
-	cp $0D
-	jr z, _Command_Search_Complete
-	cp $1B
-	jr z, _Command_Search_Complete
 	;; CAPS $41-$5A
 	;; LOWER CAPS + $20
-	call #00A2
 	jr _Command_Search_ReadInput
-
+	
 _Command_Search_Setup:	
 	nop
 	

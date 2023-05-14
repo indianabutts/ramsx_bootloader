@@ -1,8 +1,7 @@
 	include "cursor/CURSOR_CONSTANTS.asm"
 
 Cursor_CheckInput:
-	ld hl,INPUT_STATE+8
-	ld a, (hl)
+	ld a,(INPUT_STATE+8)
 	ld hl, INPUT_PREV_STATE+8
 	ld b, (hl)
 	cp b

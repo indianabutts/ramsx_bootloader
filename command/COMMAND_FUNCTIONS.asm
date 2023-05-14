@@ -1,8 +1,7 @@
 Command_CheckInput:
 _Command_CheckInput_Row8
 	;; Checking Row 8 for SPACE, <-, ->
-	ld hl, INPUT_STATE+8
-	ld a, (hl)
+	ld a, (INPUT_STATE+8)
 	ld hl, INPUT_PREV_STATE+8
 	ld b, (hl)
 	cp b
@@ -19,8 +18,7 @@ _Command_CheckInput_Row8
 _Command_CheckInput_Row5:
 	;; Second Stage is ROW 5, to Check for one of the other commands
 	;; - Search ($FE)
-	ld hl, INPUT_STATE+5
-	ld a, (hl)
+	ld a, (INPUT_STATE+5)
 	ld hl, INPUT_PREV_STATE+5
 	ld b, (hl)
 	cp b
@@ -43,6 +41,9 @@ Command_Search:
 	ld (COM_SEARCH_LENGTH), a
 _Command_Search_ReadTextInput:
 	;; First Check for ESC
+	ld a, (INPUT_STATE + 7)
+	cp $FB
+	jr z, _Command_Search_Complete
 	;; CAPS $41-$5A
 	;; LOWER CAPS + $20
 	jr _Command_Search_ReadTextInput

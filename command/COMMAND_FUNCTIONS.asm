@@ -41,10 +41,11 @@ Command_Search:
 	call VRAM_CopyWorkBufferToVDP
 	xor a
 	ld (COM_SEARCH_LENGTH), a
-_Command_Search_ReadInput:
+_Command_Search_ReadTextInput:
+	;; First Check for ESC
 	;; CAPS $41-$5A
 	;; LOWER CAPS + $20
-	jr _Command_Search_ReadInput
+	jr _Command_Search_ReadTextInput
 	
 _Command_Search_Setup:	
 	nop

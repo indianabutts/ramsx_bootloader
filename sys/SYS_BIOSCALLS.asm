@@ -67,3 +67,11 @@ SNSMAT:	equ $0141
 ;;;         further initialization.
 ;;; ====================================================	
 CHKRAM:	equ $0000
+
+;;; ====================================================
+;;; Moves cursor to the specified position
+;;; Input    : H  - Y coordinate of cursor
+;;;            L  - X coordinate of cursor
+;;; Registers: AF
+;;; ====================================================
+POSIT:	equ $00C6

@@ -1,2 +1,2 @@
 COM_SEARCH_STATUS_BAR:
-	db "?                          [Search]"
+	db "?",$C0,"                         [Search]"

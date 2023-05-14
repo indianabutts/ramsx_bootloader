@@ -29,12 +29,36 @@ Command_Search:
 	ld hl, COM_SEARCH_STATUS_BAR
 	call VRAM_SetStatusBar
 	call VRAM_CopyWorkBufferToVDP
+	ei
+	ld hl, $0100
+	call POSIT
+_Command_Search_ReadInput:
+	ei
+	call CHGET
+	di
+	cp $0D
+	jr z, _Command_Search_Complete
+	cp $1B
+	jr z, _Command_Search_Complete
+	;; CAPS $41-$5A
+	;; LOWER CAPS + $20
+	call #00A2
+	jr _Command_Search_ReadInput
+
+_Command_Search_Setup:	
+	nop
+	
+_Command_Search_Complete:
+	call VRAM_RestoreStatusBar
+	call VRAM_CopyWorkBufferToVDP
 	ret
 	
-_Command_Search_Setup
-	nop
 
-
+;;; Waits until the ACK value is found in the RAM Location
+;;; This is a blocking function and will hold until it can escape
+;;; May add a counter to give it an upper limit, since the MSX is held
+;;; Once a program is detected. If it's not held/acked within a period
+;;; Consider the command to have failed.
 _Command_WaitForAck:
 	ld a, (COM_ACK_REG)
 	cp COM_ACK_VALUE
@@ -44,6 +68,7 @@ _Command_WaitForAck:
 	ret
 _Command_WaitForAck_End:
 	nop
+	
 ;;; Function: Runs the Programming Command Flow
 ;;; This function is special since it gets copied into
 ;;; RAM along with _Command_WaitForAck so that once the
@@ -65,7 +90,7 @@ Command_ProgramRom:
 	call COM_ACK_RAM_AREA
 	ei
 	call CHKRAM
-	ret	
+	ret
 _Command_ProgramRom_End:
 	nop
 

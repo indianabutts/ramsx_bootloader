@@ -6,7 +6,7 @@ Cursor_CheckInput:
 	ld hl, INPUT_PREV_STATE+8
 	ld b, (hl)
 	cp b
-	jr z, _Cursor_CheckInput_Held
+	ret z
 	cp $DF
 	call z, Cursor_DecrementIndex
 	cp $BF

@@ -6,7 +6,7 @@ _Command_CheckInput_Row8
 	ld hl, INPUT_PREV_STATE+8
 	ld b, (hl)
 	cp b
-	ret z
+	jr z, _Command_CheckInput_Row5
 	;; Check for SPACE = Program Rom
 	cp $FE
 	call z, COM_PROG_RAM_AREA

@@ -50,4 +50,4 @@ MainLoop:
 	jr MainLoop
 
 	include "command/COMMAND_DATA.asm"
-		
+	include "command/COMMAND_VARIABLES.asm"

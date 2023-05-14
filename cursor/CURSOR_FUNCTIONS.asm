@@ -1,10 +1,10 @@
 	include "cursor/CURSOR_CONSTANTS.asm"
 
 Cursor_CheckInput:
-	ld hl,(INPUT_STATE)
-	ld a, h
-	ld hl, (INPUT_PREV_STATE)
-	ld b, h
+	ld hl,INPUT_STATE+8
+	ld a, (hl)
+	ld hl, INPUT_PREV_STATE+8
+	ld b, (hl)
 	cp b
 	jr z, _Cursor_CheckInput_Held
 	cp $DF

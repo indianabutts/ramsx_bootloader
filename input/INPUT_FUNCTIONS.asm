@@ -1,19 +1,24 @@
-Input_UpdateInputBuffers:	
-	;; Set Previous State to the last current state before check
-	ld hl, (INPUT_STATE)
-	ld (INPUT_PREV_STATE), hl
-	;; Copy Previous State into B for Comparison later
-	
-	;; Call SNSMAT to get the state for the ROW
-	;; and store it in RAM
-	ld a, INPUT_NAV_ROW
+Input_UpdateInputBuffers:
+	;; First we need to copy the last current state, to the previous state buffer
+	ld bc, 10
+	ld hl, INPUT_STATE
+	ld de, INPUT_PREV_STATE
+	ldir
+	;; Then we want to go through each row and copy them to INPUT_STATE + Row number
+
+	;; Setup Loop
+	ld hl, INPUT_STATE
+	ld c,0
+_Input_UpdateInputBuffers_Loop:	
+	ld a, c
 	call SNSMAT
-	ld h, a
-	ld a, INPUT_COM_ROW
-	call SNSMAT
-	ld l, a
-	ld (INPUT_STATE), hl
-	;; Compare New State in A with Previous State in B
+	ld (hl), a
+	inc l
+	inc c
+	ld a, c
+	cp 11
+	jr nz, _Input_UpdateInputBuffers_Loop
+	;; TODO: Add Logic for handling key being held down.
 	ret
 	
 _Input_ClearRepeat:	
@@ -31,17 +36,3 @@ _Input_IncrementRep_Over:
 	ld a, 0
 	ld (INPUT_CUR_REP_COUNT), a
 	ret
-	
-	;ld (
-	;cp $FF
-	;jr z,CheckNavInput
-	;;; Row 8 Has Sequence
-	;;; R, D, U, L
-	;;; Check for U = 11011111 (0xDF)
-	;cp $DF
-	;call z, DecrementCursor
-	;;; Check for D = 10111111 (0xBF)
-	;cp $BF
-	;call z, IncrementCursor
-	;ret
-

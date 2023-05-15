@@ -39,7 +39,6 @@ Command_Search:
 	call VRAM_CopyWorkBufferToVDP
 	xor a
 	ld (COM_SEARCH_LENGTH), a
-	ld iy, 0
 _Command_Search_ReadTextInput:
 	call Input_UpdateInputBuffers
 	;; First Check for ESC
@@ -82,8 +81,14 @@ _Command_Search_IncRow:
 	jr z, _Command_Search_ReadTextInput ;If so, Jump to readTextInput
 	jr _Command_Search_ParseRows ;Otherwise, Parse the next Row
 _Command_Search_CheckChar:
-	;; CAPS $41-$5A
-	;; LOWER CAPS + $20
+	ld hl, VRAM_WRK_STATUS_BAR_INPUT_BASE
+	ld a, (COM_SEARCH_LENGTH)
+	ld c, a
+	ld b, 0
+	add hl, bc
+	ld (hl), ixl
+	inc a
+	ld (COM_SEARCH_LENGTH), a
 	jr _Command_Search_ReadTextInput
 _Command_Search_Complete:
 	nop

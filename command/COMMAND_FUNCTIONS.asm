@@ -39,23 +39,61 @@ Command_Search:
 	call VRAM_CopyWorkBufferToVDP
 	xor a
 	ld (COM_SEARCH_LENGTH), a
+	ld iy, 0
 _Command_Search_ReadTextInput:
+	call Input_UpdateInputBuffers
 	;; First Check for ESC
 	ld a, (INPUT_STATE + 7)
 	cp $FB
+	jr z, _Command_Search_Exit
+	;; Check for RET and Complete the Flow
+	cp $7F
 	jr z, _Command_Search_Complete
+
+	;; Pseudo Flow
+	ld bc, $0002			 ; Set Col (b) to 0, Row (c) 2
+	ld ix, $003A			 ; Set IX to ASCII A (0x41) - 7
+	ld a, c
+_Command_Search_ParseRows :
+	ld hl, INPUT_STATE
+	ld de, 0
+	ld e, a
+	add hl, de
+	ld a, (hl)
+_Command_Search_ParseColumns:
+	inc ix				 ; Increment the ASCII Code Counter
+	bit 0, a  			 ; Check Bit 0
+	jr z, _Command_Search_CheckChar ; If Bit 0 is a match, Jump
+					 ; to CheckChar Routine	
+	inc b				 ; Increment Column
+	ld e, a				 ; Store A into E
+	ld a, b				 ; Load Column into A
+	cp 8				 ; Check if Col is 9
+	jr z, _Command_Search_IncRow	 ; Increment Row if True
+	ld a, e				 ; Otherwise Restore Value of A from E
+	srl a				 ; and Shift A
+	jr _Command_Search_ParseColumns
+
+_Command_Search_IncRow:
+	inc c			; Increment Row
+	ld b, 0			; Reset Column
+	ld a, c			; Load Row into A for Compare
+	cp 6			; Check if Row is 6
+	jr z, _Command_Search_ReadTextInput ;If so, Jump to readTextInput
+	jr _Command_Search_ParseRows ;Otherwise, Parse the next Row
+_Command_Search_CheckChar:
 	;; CAPS $41-$5A
 	;; LOWER CAPS + $20
-	call Input_UpdateInputBuffers
 	jr _Command_Search_ReadTextInput
-	
-_Command_Search_Setup:	
-	nop
-	
 _Command_Search_Complete:
+	nop
+_Command_Search_Exit:
+	;; Restore the Status Bar and Return
+	;; to Main Loop
 	call VRAM_RestoreStatusBar
 	call VRAM_CopyWorkBufferToVDP
 	ret
+
 	
 
 ;;; Waits until the ACK value is found in the RAM Location

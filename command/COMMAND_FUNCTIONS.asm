@@ -109,7 +109,7 @@ _Command_Search_Exit:
 _Command_WaitForAck:
 	ld a, (COM_ACK_REG)
 	cp COM_ACK_VALUE
-	;; jr nz, _Command_WaitForAck 
+	jp nz, COM_ACK_RAM_AREA
 	xor a
 	ld (COM_ACK_REG), a
 	ret
@@ -125,15 +125,9 @@ _Command_WaitForAck_End:
 Command_ProgramRom:
 	ld a, (CUR_INDEX)
 	ld (COM_INDEX_REG), a
-	ld a, (COM_ACT_PROG)
+	ld a, COM_ACT_PROG
 	ld (COM_ACTION_REG), a
-	ld a, (COM_START)
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
+	ld (COM_START), a
 	call COM_ACK_RAM_AREA
 	ei
 	call CHKRAM

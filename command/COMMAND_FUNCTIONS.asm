@@ -6,15 +6,12 @@ _Command_CheckInput_Row8
 	ld b, (hl)
 	cp b
 	jr z, _Command_CheckInput_Row5
-	;; Check for SPACE = Program Rom
-	cp $FE
+	cp $FE			;Check for SPACE = Prog Rom
 	call z, COM_PROG_RAM_AREA
-	;; Check for -> = Page Up
-	cp $EF
-	jr z, _Command_CheckInput_Held
-	;; Check for <- = Page Down
-	cp $7F
-	jr z, _Command_CheckInput_Held
+	cp $7F			; Check for -> = Page Up
+	call z, Command_PageUp
+	cp $EF			; Check for <- = Page Down
+	call z, Command_PageDown
 _Command_CheckInput_Row5:
 	;; Second Stage is ROW 5, to Check for one of the other commands
 	;; - Search ($FE)
@@ -28,7 +25,35 @@ _Command_CheckInput_Row5:
 	ret
 _Command_CheckInput_Held:
 	ret
-	
+
+Command_PageUp:
+	ld a, COM_ACT_PU
+	ld (COM_ACTION_REG), a
+	ld a, (COM_START)
+	ld a, (COM_START)
+	ld a, (COM_START)
+
+	call COM_ACK_RAM_AREA
+	xor a
+	ld (CUR_INDEX), a
+	call VRAM_CopyBufferToRam
+	call VRAM_CopyWorkBufferToVDP
+	ret
+Command_PageDown:
+	ld a, COM_ACT_PD
+	ld (COM_ACTION_REG), a
+	ld a, (COM_START)
+	ld a, (COM_START)
+	ld a, (COM_START)
+
+	ex (sp), hl
+	ex (sp), hl
+	call COM_ACK_RAM_AREA
+	xor a
+	ld (CUR_INDEX), a
+	call VRAM_CopyBufferToRam
+	call VRAM_CopyWorkBufferToVDP
+	ret
 
 Command_Search:
 	;; Copy the current Status Bar to RAM

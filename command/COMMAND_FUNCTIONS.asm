@@ -72,7 +72,6 @@ _Command_Search_ReadTextInput:
 	;; Check for RET and Complete the Flow
 	cp $7F
 	jr z, _Command_Search_Complete
-
 	;; Pseudo Flow
 	ld bc, $0002			 ; Set Col (b) to 0, Row (c) 2
 	ld ix, $003A			 ; Set IX to ASCII A (0x41) - 7
@@ -125,6 +124,16 @@ _Command_Search_CheckChar:
 	jr _Command_Search_ReadTextInput
 _Command_Search_Complete:
 	nop
+	ld hl, COM_SEARCH_QUERY
+	ld a, (COM_SEARCH_LENGTH)
+	ld c, a
+	ld b, 0
+	inc c
+	add hl, bc 
+	ld (hl), $FF
+	ld de, COM_FINAL_SEARCH_QUERY
+	ld hl, COM_SEARCH_QUERY
+	ldir
 _Command_Search_Exit:
 	;; Restore the Status Bar and Return
 	;; to Main Loop

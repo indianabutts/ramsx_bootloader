@@ -68,7 +68,16 @@ _Command_Search_ReadTextInput:
 	;; First Check for ESC
 	ld a, (INPUT_STATE + 7)
 	cp $FB
-	jr z, _Command_Search_Exit
+	jp z, _Command_Search_Exit
+	;; Check for BS
+	ld hl, INPUT_PREV_STATE + 7
+	ld b, (hl)
+	cp b
+	jr z, _Command_Search_Ret_Check
+	or a
+	cp $DF
+	jp z, _Command_Search_Backspace
+_Command_Search_Ret_Check:
 	;; Check for RET and Complete the Flow
 	cp $7F
 	jr z, _Command_Search_Complete
@@ -76,6 +85,7 @@ _Command_Search_ReadTextInput:
 	ld bc, $0002			 ; Set Col (b) to 0, Row (c) 2
 	ld ix, $003A			 ; Set IX to ASCII A (0x41) - 7
 	ld a, c
+	
 _Command_Search_ParseRows:
 	;; Need to check if the row is unmodified, if it is we increment to the next row
 	;; A needs to be preserved
@@ -110,7 +120,7 @@ _Command_Search_CheckChar:
 	ld a, (COM_SEARCH_LENGTH)
 	ld c, a
 	ld b, 0
-	ld hl, COM_SEARCH_QUERY
+	ld hl, COM_SEARCH_QUERY_RAM
 	add hl, bc
 	ld a, ixl
 	ld (hl), a
@@ -124,24 +134,44 @@ _Command_Search_CheckChar:
 	jr _Command_Search_ReadTextInput
 _Command_Search_Complete:
 	nop
-	ld hl, COM_SEARCH_QUERY
+	ld hl, COM_SEARCH_QUERY_RAM
 	ld a, (COM_SEARCH_LENGTH)
 	ld c, a
 	ld b, 0
 	inc c
 	add hl, bc 
 	ld (hl), $FF
-	ld de, COM_FINAL_SEARCH_QUERY
-	ld hl, COM_SEARCH_QUERY
+	ld de, COM_SEARCH_QUERY_ROM
+	ld hl, COM_SEARCH_QUERY_RAM
 	ldir
+_Command_Search_Trigger:
+	ld a, COM_ACT_SEARCH
+	ld (COM_ACTION_REG), a
+	ld (COM_START), a
+	ld b, $FF
+	call COM_ACK_RAM_AREA
+	cp COM_ACK_VALUE
+	jp nz, _Command_Search_Trigger
+	xor a
+	ld (COM_ACK_REG), a
 _Command_Search_Exit:
 	;; Restore the Status Bar and Return
 	;; to Main Loop
 	call VRAM_RestoreStatusBar
 	call VRAM_CopyWorkBufferToVDP
 	ret
+_Command_Search_Backspace:
+	ld a, (COM_SEARCH_LENGTH)
+	ld c, a
+	ld b, 0
+	ld hl, VRAM_WRK_STATUS_BAR_INPUT_BASE
+	add hl, bc
+	ld (hl), SPACE_CODE
+	dec a
+	ld (COM_SEARCH_LENGTH), a
+	call VRAM_CopyWorkBufferToVDP
+	jp _Command_Search_ReadTextInput
 
-	
 
 ;;; Waits until the ACK value is found in the RAM Location
 ;;; This is a blocking function and will hold until it can escape

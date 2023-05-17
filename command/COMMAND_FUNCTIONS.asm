@@ -30,11 +30,12 @@ Command_PageUp:
 	ld a, COM_ACT_PU
 	ld (COM_ACTION_REG), a
 	ld a, (COM_START)
-	ld a, (COM_START)
-	ld a, (COM_START)
-
+	ld b, $FF
 	call COM_ACK_RAM_AREA
+	cp COM_ACK_VALUE
+	jp nz, Command_PageUp
 	xor a
+	ld (COM_ACK_REG), a
 	ld (CUR_INDEX), a
 	call VRAM_CopyBufferToRam
 	call VRAM_CopyWorkBufferToVDP
@@ -43,18 +44,16 @@ Command_PageDown:
 	ld a, COM_ACT_PD
 	ld (COM_ACTION_REG), a
 	ld a, (COM_START)
-	ld a, (COM_START)
-	ld a, (COM_START)
-
-	ex (sp), hl
-	ex (sp), hl
+	ld b, $FF
 	call COM_ACK_RAM_AREA
+	cp COM_ACK_VALUE
+	jp nz, Command_PageDown
 	xor a
+	ld (COM_ACK_REG), a
 	ld (CUR_INDEX), a
 	call VRAM_CopyBufferToRam
 	call VRAM_CopyWorkBufferToVDP
 	ret
-
 Command_Search:
 	;; Copy the current Status Bar to RAM
 	call VRAM_BackupStatusBar
@@ -134,10 +133,13 @@ _Command_Search_Exit:
 _Command_WaitForAck:
 	ld a, (COM_ACK_REG)
 	cp COM_ACK_VALUE
+	ret z
+	dec b
 	jp nz, COM_ACK_RAM_AREA
-	xor a
-	ld (COM_ACK_REG), a
 	ret
+	;;jp nz, COM_ACK_RAM_AREA
+	;; xor a
+	;; ld (COM_ACK_REG), a
 _Command_WaitForAck_End:
 	nop
 	
@@ -153,7 +155,10 @@ Command_ProgramRom:
 	ld a, COM_ACT_PROG
 	ld (COM_ACTION_REG), a
 	ld (COM_START), a
+	ld b, $FF
 	call COM_ACK_RAM_AREA
+	cp COM_ACK_VALUE
+	jp nz, COM_PROG_RAM_AREA
 	ei
 	call CHKRAM
 	ret

@@ -77,7 +77,9 @@ _Command_Search_ReadTextInput:
 	ld bc, $0002			 ; Set Col (b) to 0, Row (c) 2
 	ld ix, $003A			 ; Set IX to ASCII A (0x41) - 7
 	ld a, c
-_Command_Search_ParseRows :
+_Command_Search_ParseRows:
+	;; Need to check if the row is unmodified, if it is we increment to the next row
+	;; A needs to be preserved
 	ld hl, INPUT_STATE
 	ld de, 0
 	ld e, a
@@ -105,14 +107,21 @@ _Command_Search_IncRow:
 	jr z, _Command_Search_ReadTextInput ;If so, Jump to readTextInput
 	jr _Command_Search_ParseRows ;Otherwise, Parse the next Row
 _Command_Search_CheckChar:
-	ld hl, VRAM_WRK_STATUS_BAR_INPUT_BASE
+	;; IX contains the ASCII Character
 	ld a, (COM_SEARCH_LENGTH)
 	ld c, a
 	ld b, 0
+	ld hl, COM_SEARCH_QUERY
 	add hl, bc
-	ld (hl), ixl
-	inc a
-	ld (COM_SEARCH_LENGTH), a
+	ld a, ixl
+	ld (hl), a
+	ld hl, VRAM_WRK_STATUS_BAR_INPUT_BASE
+	add hl, bc
+	ld (hl), a
+	inc c
+	ld hl, COM_SEARCH_LENGTH
+	ld (hl), c
+	call VRAM_CopyWorkBufferToVDP
 	jr _Command_Search_ReadTextInput
 _Command_Search_Complete:
 	nop

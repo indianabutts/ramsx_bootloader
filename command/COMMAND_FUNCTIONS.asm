@@ -129,8 +129,11 @@ _Command_Search_IncRow:
 _Command_Search_CheckChar:
 	;; IX contains the ASCII Character
 	;; C contains the ROW
-
-	;;  First we check if this is the same character as before
+	;; First we see if the search query is too long
+	ld a, (COM_SEARCH_LENGTH)
+	cp 20
+	jr z, _Command_Search_ReadTextInput
+	;; First we check if this is the same character as before
 	ld b, 0
 	ld hl, INPUT_STATE
 	add hl, bc

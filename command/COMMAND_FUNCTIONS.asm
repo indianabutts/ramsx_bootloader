@@ -81,6 +81,17 @@ _Command_Search_Ret_Check:
 	;; Check for RET and Complete the Flow
 	cp $7F
 	jr z, _Command_Search_Complete
+_Command_Search_Space_Check:
+	ld a, (INPUT_STATE+8)
+	ld hl, (INPUT_PREV_STATE+8)
+	ld b, (hl)
+	cp b
+	jr z, _Command_Search_Ret_Check
+	or a
+	ld bc, $0008
+	ld ix, SPACE_CODE
+	cp $FE
+	jr z, _Command_Search_CheckChar
 	;; Pseudo Flow
 	ld bc, $0002			 ; Set Col (b) to 0, Row (c) 2
 	ld ix, $003A			 ; Set IX to ASCII A (0x41) - 7
@@ -117,9 +128,21 @@ _Command_Search_IncRow:
 	jr _Command_Search_ParseRows ;Otherwise, Parse the next Row
 _Command_Search_CheckChar:
 	;; IX contains the ASCII Character
+	;; C contains the ROW
+
+	;;  First we check if this is the same character as before
+	ld b, 0
+	ld hl, INPUT_STATE
+	add hl, bc
+	ld a, (hl) 		;Load Current State to A
+	ld hl, INPUT_PREV_STATE
+	add hl, bc
+	ld b, (hl)		;Load Previous State to B
+	cp b			;Check, If Equal, Return to ReadInput
+	jr z, _Command_Search_ReadTextInput
+	ld b, 0
 	ld a, (COM_SEARCH_LENGTH)
 	ld c, a
-	ld b, 0
 	ld hl, COM_SEARCH_QUERY_RAM
 	add hl, bc
 	ld a, ixl
@@ -127,11 +150,13 @@ _Command_Search_CheckChar:
 	ld hl, VRAM_WRK_STATUS_BAR_INPUT_BASE
 	add hl, bc
 	ld (hl), a
+	inc hl
+	ld (hl), UNDERSCORE_CODE
 	inc c
 	ld hl, COM_SEARCH_LENGTH
 	ld (hl), c
 	call VRAM_CopyWorkBufferToVDP
-	jr _Command_Search_ReadTextInput
+	jp _Command_Search_ReadTextInput
 _Command_Search_Complete:
 	nop
 	ld hl, COM_SEARCH_QUERY_RAM
@@ -162,11 +187,14 @@ _Command_Search_Exit:
 	ret
 _Command_Search_Backspace:
 	ld a, (COM_SEARCH_LENGTH)
+	
 	ld c, a
 	ld b, 0
 	ld hl, VRAM_WRK_STATUS_BAR_INPUT_BASE
 	add hl, bc
 	ld (hl), SPACE_CODE
+	dec hl
+	ld (hl), UNDERSCORE_CODE
 	dec a
 	ld (COM_SEARCH_LENGTH), a
 	call VRAM_CopyWorkBufferToVDP

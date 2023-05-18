@@ -161,7 +161,6 @@ _Command_Search_CheckChar:
 	call VRAM_CopyWorkBufferToVDP
 	jp _Command_Search_ReadTextInput
 _Command_Search_Complete:
-	nop
 	ld hl, COM_SEARCH_QUERY_RAM
 	ld a, (COM_SEARCH_LENGTH)
 	ld c, a
@@ -182,6 +181,24 @@ _Command_Search_Trigger:
 	jp nz, _Command_Search_Trigger
 	xor a
 	ld (COM_ACK_REG), a
+	ld a, $FF
+	ld hl, COM_SEARCH_QUERY_RAM
+	ld de, COM_SEARCH_QUERY_RAM+1
+	ld (hl), a
+	ld a, (COM_SEARCH_LENGTH)
+	ld c, a
+	ld b, 0
+	ldir
+	ld a, $FF
+	ld hl, COM_SEARCH_QUERY_ROM
+	ld de, COM_SEARCH_QUERY_ROM+1
+	ld (hl), a
+	ld a, (COM_SEARCH_LENGTH)
+	ld c, a
+	ld b, 0
+	ldir
+	xor a
+	ld (COM_SEARCH_LENGTH),a
 _Command_Search_Exit:
 	;; Restore the Status Bar and Return
 	;; to Main Loop
@@ -190,9 +207,12 @@ _Command_Search_Exit:
 	ret
 _Command_Search_Backspace:
 	ld a, (COM_SEARCH_LENGTH)
-	
-	ld c, a
+	ld hl, COM_SEARCH_QUERY_RAM
 	ld b, 0
+	ld c, a
+	add hl, bc
+	dec hl
+	ld (hl), $FF
 	ld hl, VRAM_WRK_STATUS_BAR_INPUT_BASE
 	add hl, bc
 	ld (hl), SPACE_CODE

@@ -23,6 +23,8 @@ _Command_CheckInput_Row5:
 	ret z
 	cp $FE
 	call z, Command_Search
+	cp $DF
+	call z, Command_Rebuild
 	ret
 _Command_CheckInput_Held:
 	ret
@@ -48,3 +50,4 @@ _Command_WaitForAck_End:
 	include "command/COMMAND_PAGING_FUNCTION.asm"
 	include "command/COMMAND_SEARCH_FUNCTION.asm"
 	include "command/COMMAND_PROG_FUNCTION.asm"
+	include "command/COMMAND_REBUILD_FUNCTION.asm"

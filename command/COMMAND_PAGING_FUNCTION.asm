@@ -10,8 +10,8 @@ Command_PageUp:
 	ld (COM_ACK_REG), a
 	ld (CUR_INDEX), a
 	call VRAM_CopyBufferToRam
-	call VRAM_CopyWorkBufferToVDP
-	ret
+	jp VRAM_CopyWorkBufferToVDP
+	
 Command_PageDown:
 	ld a, COM_ACT_PD
 	ld (COM_ACTION_REG), a
@@ -24,5 +24,5 @@ Command_PageDown:
 	ld (COM_ACK_REG), a
 	ld (CUR_INDEX), a
 	call VRAM_CopyBufferToRam
-	call VRAM_CopyWorkBufferToVDP
-	ret
+	jp VRAM_CopyWorkBufferToVDP
+	

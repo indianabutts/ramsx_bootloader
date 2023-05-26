@@ -13,6 +13,7 @@ COM_ACT_PROG:		equ $60		; Value for Program
 COM_ACT_DIRIN:		equ $50		; Value for Entering a Dir (Not in v0)
 COM_ACT_DIROUT:		equ $5F		; Value for Backing out of a Dir (Not in v0)
 COM_ACT_SEARCH:		equ $6F		; Value for Initiating a search
+COM_ACT_REBUILD:	equ $30		; Value for Rebuilding Index File
 COM_ACK_VALUE:		equ $A2		; Value that signifies MCU has Acknowledged Command
 
 ;;; Command Flow Constants for UX

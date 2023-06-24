@@ -10,7 +10,7 @@
 ;;;       HL - Start address of memory
 ;;; Registers: All
 ;;; ====================================================
-LDIRVM: equ $005C
+LDIRVM equ $005C
 
 ;;; ====================================================
 ;;; Changes the screen colors
@@ -20,7 +20,7 @@ LDIRVM: equ $005C
 ;;;       Border Color in BDRCLR
 ;;; Registers: All
 ;;; ====================================================
-CHGCLR:	equ $0062
+CHGCLR	equ $0062
 
 ;;; ====================================================
 ;;; Clears the screen
@@ -30,7 +30,7 @@ CHGCLR:	equ $0062
 ;;;       Border Color in BDRCLR
 ;;; Registers: All
 ;;; ====================================================
-CLS:	equ $00C3
+CLS	equ $00C3
 
 ;;; ====================================================
 ;;; Switches to SCREEN 0 (text screen with 40×24 characters)Clears the screen
@@ -39,7 +39,7 @@ CLS:	equ $00C3
 ;;;       TXTCGP
 ;;; Registers: All
 ;;; ====================================================
-INITXT:	equ #006C
+INITXT	equ $006C
 
 ;;; ====================================================
 ;;; One character input (waiting)
@@ -47,7 +47,7 @@ INITXT:	equ #006C
 ;;;       A - ASCII Code of the input character
 ;;; Registers: AF
 ;;; ====================================================	
-CHGET:	equ $009F
+CHGET	equ $009F
 
 ;;; ====================================================
 ;;; Returns the value of the specified line from the keyboard matrix
@@ -57,7 +57,7 @@ CHGET:	equ $009F
 ;;;       A - Data with Key Press represented as 0
 ;;; Registers: AF
 ;;; ====================================================	
-SNSMAT:	equ $0141
+SNSMAT	equ $0141
 
 ;;; ====================================================
 ;;; Also called STARTUP, RESET or BOOT - Tests RAM and
@@ -66,7 +66,7 @@ SNSMAT:	equ $0141
 ;;; Remark: After this, a jump must be made to INIT, for
 ;;;         further initialization.
 ;;; ====================================================	
-CHKRAM:	equ $0000
+CHKRAM	equ $0000
 
 ;;; ====================================================
 ;;; Moves cursor to the specified position
@@ -74,4 +74,4 @@ CHKRAM:	equ $0000
 ;;;            L  - X coordinate of cursor
 ;;; Registers: AF
 ;;; ====================================================
-POSIT:	equ $00C6
+POSIT	equ $00C6

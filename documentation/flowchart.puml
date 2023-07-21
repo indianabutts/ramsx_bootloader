@@ -1,0 +1,105 @@
+@startuml
+start
+partition Init {
+	:Set Screen Mode to 0;
+	:Set Background Color to 1;
+	:Set Border Color to 1;
+	:Call CHGCLR BIOS Call;
+	:Set Current and Previous Cursor Index to 0;
+	:Copy 'Check Command Ack' Function to RAM;	
+	:Copy Initial VRAM Buffer to RAM;
+	:Show Splash Screen;
+}
+
+Partition "Main Loop" {
+	  repeat
+		Partition "Update Input State (A, C, HL)"{
+			  :Copy "Current Input State" into "Previous Input State" Buffer;
+			  :Copy "Current Input State" Pointer to HL Register;
+			  :Set C Register to 0;
+			  	repeat :Set A to Current Row (C);
+				       :Call "SNSMAT" BIOS Call and store Current Row State to A;
+				       :Store "Current Row State" to Location in HL;
+				       :Push HL to Stack;
+				       :Load two-byte repeat buffer to HL;
+				       :Compare Prev & Current State;
+				       :Shift HL Left by 1 Bit (ADD HL, HL);
+				       if (Prev == Current) then (Yes)
+				       	  :Add 1 to HL;
+				       endif
+				       :Store HL to Repeat Buffer;
+				       :Pop HL from Stack;
+				       :TODO - Add Process to Store Single bit per row if row is repeated;
+				       :Increment Pointer in HL (Inc L);
+				       :Increment C;
+				 repeat while (c<11) is (True) not (False)
+		}
+		:Check Program State;
+		switch (state)
+		       case (Search)
+		       	    Partition "Search" {
+			    	      :Text 1;
+				      }
+	               case (Config)
+		       	    Partition "Config" {	
+			    	      :Text 2;
+				      }
+		       case (Program)
+		       	    Partition "Program Rom" {	
+			              :Text 2;
+				      }
+                       case (Page Up/Down)
+		       	    Partition "Page Up/Down" {		
+			    	      :Text 2;
+				      }
+		       case (Cursor Up/Down)
+		       	    Partition "Cursor Up/Down" {
+			    	      :Text 2;
+				      }
+		       case (Rebuild)
+		       	    Partition "Rebuild Library" {
+			    	      :Text 2;
+				      }
+		       case (Idle)
+		       	    Partition "Idle" {
+			    	      :Load "Input Repeat" Repeat to HL;
+				      :Shift Right by 8;
+				      :Set "B" to Idle;
+				      if(L & 0x01) then (No)
+				      	   :Load "Input State" for Row 8 to A;
+					   switch(Input Row 8)
+						case(0xDF)
+							:Set B to "Cursor Down";
+						case(0xBF)
+							:Set B to "Cursor Up";
+						case(0xFE)
+							:Set B to "Program";
+						case(0x7F)
+							:Set B to "Page Up";
+						case(0xEF)
+							:Set B to "Page Down";
+					    endswitch
+				       endif
+				       :Load "Input Repeat"  to HL;
+				       if(L & 0x10) then (No)
+				       	    :Load "Input State" for Row 5 to A;
+					    switch(Input Row 5)
+						case(0xFE)
+							:Set B to "Search";
+						case(0xDF)
+							:Set B to "Rebuild";
+					    endswitch
+					endif
+					:Load State Pointer to HL;
+					:Load B to A;
+					:Load A to State Pointer Location;
+					}			
+						
+		endswitch
+		:Copy VRAM Buffer to VDP;
+	repeat while (terminated?) is (No) not (Yes)
+}
+
+stop
+@enduml
+						

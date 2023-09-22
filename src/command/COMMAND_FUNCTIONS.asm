@@ -47,7 +47,7 @@ _Command_WaitForAck:
 _Command_WaitForAck_End:
 	nop
 	
-	include "command/COMMAND_PAGING_FUNCTION.asm"
-	include "command/COMMAND_SEARCH_FUNCTION.asm"
-	include "command/COMMAND_PROG_FUNCTION.asm"
-	include "command/COMMAND_REBUILD_FUNCTION.asm"
+	include "COMMAND_PAGING_FUNCTION.asm"
+	include "COMMAND_SEARCH_FUNCTION.asm"
+	include "COMMAND_PROG_FUNCTION.asm"
+	include "COMMAND_REBUILD_FUNCTION.asm"

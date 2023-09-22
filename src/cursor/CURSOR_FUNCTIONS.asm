@@ -1,4 +1,4 @@
-	include "cursor/CURSOR_CONSTANTS.asm"
+	include "CURSOR_CONSTANTS.asm"
 
 Cursor_CheckInput:
 	ld a,(INPUT_STATE+8)

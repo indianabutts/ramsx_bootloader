@@ -74,3 +74,5 @@ MainLoop:
 	include "states/splash_state/splash_state.asm"
 	include "states/browse_state/browse_state.asm"
 	include "states/search_state/search_state.asm"
+	include "states/search_result_state/search_result_state.asm"
+	include "states/settings_state/settings_state.asm"

@@ -1,6 +1,6 @@
 *.sym
 *.rom
-
+.DS_Store
 ### Emacs ###
 # -*- mode: gitignore; -*-
 *~

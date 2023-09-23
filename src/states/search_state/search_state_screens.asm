@@ -1,5 +1,5 @@
 SEARCH_STATE_DISPLAY:
-	db " Implication Station          ",__DATE__
+	db " Implication Station         ",__DATE__," "
 	db "                                        "
 	db " Search Setup                           "
 	db "                                        "

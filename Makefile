@@ -1,2 +1,8 @@
 compile:
-	sjasmplus --lst=out/bootloader.sym --outprefix=../out/ src/bootloader.asm
+	sjasmplus --lst=out/bootloader.sym --raw=out/bootloader.rom src/bootloader.asm
+
+run: compile
+	openmsx out/bootloader.rom
+
+clean:
+	rm out/*

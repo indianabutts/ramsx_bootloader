@@ -1,3 +1,6 @@
+	DEFINE MajorVersion 0
+	DEFINE MinorVersion 1
+	DEFINE VersionString "0.1"
 				; ==[ Constants ]============================================
 
 
@@ -23,8 +26,25 @@ TOTAL_PAGES:
 	include "utils/MATH_FUNCTIONS.asm"
 	include "input/INPUT_FUNCTIONS.asm"
 	include "command/COMMAND_FUNCTIONS.asm"
+
+
+
 				; ==[ Program ]=============================================
 Init:
+	call INITXT
+	ld a, 1
+	ld (BAKCLR), a
+	ld (BDCLR), a
+	ld a, 0
+	call CHGCLR
+	ld hl, SPLASH_STATE_DISPLAY
+	ld de, (TXTNAM)
+	ld bc, 960
+	call LDIRVM
+
+MainLoopTest:
+	jr MainLoopTest
+InitTemp:
 	;; Set Screen Mode to 0
 	call INITXT
 	;; Set Pallette to White on Black
@@ -51,3 +71,4 @@ MainLoop:
 
 	include "command/COMMAND_DATA.asm"
 	include "command/COMMAND_VARIABLES.asm"
+	include "states/splash_state/splash_state.asm"

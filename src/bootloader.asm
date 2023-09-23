@@ -2,31 +2,35 @@
 	DEFINE MinorVersion 1
 	DEFINE VersionString "0.1"
 				; ==[ Constants ]============================================
-
+	
 
 	include "sys/SYS_BIOSCALLS.asm"
 	include "sys/SYS_VARIABLES.asm"
+	include "MAIN_CONSTANTS.asm"
+	
+		/*
 	include "utils/CHAR_CODES.asm"
 	include "cursor/CURSOR_VARIABLES.asm"
 	include "vram/VRAM_VARIABLES.asm"
 	include "input/INPUT_VARIABLES.asm"
-	include "MAIN_CONSTANTS.asm"
+
 	include "command/COMMAND_CONSTANTS.asm"
 	include "input/INPUT_CONSTANTS.asm"
 	include "vram/VRAM_CONSTANTS.asm"
+	*/
 	include "utils/CART_HEADER.asm"
-
-	include "vram/VRAM_BUFFER.asm"
+	dw BROWSE_STATE_DISPLAY
+	;; 	include "vram/VRAM_BUFFER.asm" 
 	
 TOTAL_PAGES:
 	dw 30
-
+	/*
 	include "cursor/CURSOR_FUNCTIONS.asm"
-	include "vram/VRAM_FUNCTIONS.asm"
+	;; 	include "vram/VRAM_FUNCTIONS.asm"
 	include "utils/MATH_FUNCTIONS.asm"
 	include "input/INPUT_FUNCTIONS.asm"
 	include "command/COMMAND_FUNCTIONS.asm"
-
+*/
 
 
 				; ==[ Program ]=============================================
@@ -44,6 +48,7 @@ Init:
 
 MainLoopTest:
 	jr MainLoopTest
+/*
 InitTemp:
 	;; Set Screen Mode to 0
 	call INITXT
@@ -68,7 +73,7 @@ MainLoop:
 	call Cursor_CheckInput
 	call Command_CheckInput
 	jr MainLoop
-
+*/
 	include "command/COMMAND_DATA.asm"
 	include "command/COMMAND_VARIABLES.asm"
 	include "states/splash_state/splash_state.asm"

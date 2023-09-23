@@ -1,0 +1,27 @@
+SEARCH_STATE_DISPLAY:
+	db " Implication Station          ",__DATE__
+	db "                                        "
+	db " Search Setup                           "
+	db "                                        "
+	db " Query:[_____________________]          "
+	db "                                        "
+	db "                                        "
+	db " [ ] Search Recursively                 "
+	db "                                        "
+	db "                                        "
+	db "                                        "
+	db "                                        "
+	db "                                        "
+	db " Press Enter to Start                   "
+	db "                                        "
+	db " Press Esc to Return                    "
+	db "                                        "
+	db "                                        "
+	db "                                        "
+	db "                                        "
+	db "                                        "
+	db "                                        "
+	db "                                        "
+	db "                                        "
+.END:
+	nop

@@ -37,7 +37,7 @@ Init:
 	ld (BDCLR), a
 	ld a, 0
 	call CHGCLR
-	ld hl, BROWSE_STATE_DISPLAY
+	ld hl, SEARCH_STATE_DISPLAY
 	ld de, (TXTNAM)
 	ld bc, 960
 	call LDIRVM
@@ -73,3 +73,4 @@ MainLoop:
 	include "command/COMMAND_VARIABLES.asm"
 	include "states/splash_state/splash_state.asm"
 	include "states/browse_state/browse_state.asm"
+	include "states/search_state/search_state.asm"

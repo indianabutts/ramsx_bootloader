@@ -6,11 +6,11 @@ Mult8x8:
 	and e
 	ld l,a
 	ld b, 7
-_Mult8x8_Loop:
+.Loop:
 	add hl, hl
 	jr nc, $+3
 	add hl, de
-	djnz _Mult8x8_Loop
+	djnz .Loop
 	ret
 
 ;;; Mult DE by A and store Result in AHL
@@ -23,11 +23,11 @@ Mult8x16:
 	ld h,d
 	ld l,e
 	ld b,7
-_Mult8x16_Loop:
+.Loop:
 	add hl, hl
 	rla
 	jr nc, $+4
 	add hl, de
 	adc a, c
-	djnz _Mult8x16_Loop
+	djnz .Loop
 	ret

@@ -1,12 +1,12 @@
+				; ==[ Constants ]============================================			
 	DEFINE MajorVersion 0
 	DEFINE MinorVersion 1
 	DEFINE VersionString "0.1"
-				; ==[ Constants ]============================================
+	DEFINE ORGADDR $4000	; Origin for the ROM
 	
 
 	include "sys/SYS_BIOSCALLS.asm"
 	include "sys/SYS_VARIABLES.asm"
-	include "MAIN_CONSTANTS.asm"
 	
 		/*
 	include "utils/CHAR_CODES.asm"
@@ -28,10 +28,10 @@ TOTAL_PAGES:
 	include "cursor/CURSOR_FUNCTIONS.asm"
 	;; 	include "vram/VRAM_FUNCTIONS.asm"
 	include "utils/MATH_FUNCTIONS.asm"
-	include "input/INPUT_FUNCTIONS.asm"
+
 	include "command/COMMAND_FUNCTIONS.asm"
 */
-
+	include "utils/INPUT_FUNCTIONS.asm"
 
 				; ==[ Program ]=============================================
 Init:
@@ -47,6 +47,7 @@ Init:
 	call LDIRVM
 
 MainLoopTest:
+	call Input.UpdateInputBuffers
 	jr MainLoopTest
 /*
 InitTemp:

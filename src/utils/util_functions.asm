@@ -50,4 +50,3 @@ WaitSeconds:
 	dec a
 	jr nz,.ALoop
 	ret
-	

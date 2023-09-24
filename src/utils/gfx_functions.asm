@@ -1,6 +1,8 @@
 
 VRAM_WRK_AREA		equ $C100	; Base address for the RAM copy of the VRAM Buffer
-	
+VRAM_WRK_STATUS_BAR_BASE	equ VRAM_WRK_AREA+$398
+VRAM_WRK_STATUS_BAR_INPUT_BASE	equ VRAM_WRK_STATUS_BAR_BASE + 1
+
 ;;; TODO: Comment these functions
 VRAM:
 .CopyWorkBufferToVDP:
